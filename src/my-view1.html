@@ -1,0 +1,269 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view1">
+  <style include="iron-flex iron-flex-alignment"></style>
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .device-manager {
+        padding: 10px;
+        display: flex;
+      }
+      .device-entry {
+        height: 350px;
+        padding: 10px;
+        text-align: center;
+        display: block;
+
+      }
+      .device-entry img {
+        width: 140px;
+      }
+
+/*devtools squares*/
+.square {
+    width: 16px;
+    height: 16px;
+}
+
+.yellow {
+    background-color: #F3D27C;
+    border: 1px solid #C3A863;
+}
+
+.green {
+    background-color: #90C285;
+    border: 1px solid #6E9766;
+}
+
+.timeline-aggregated-info-legend > div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.timeline-aggregated-legend-value {
+    display: inline-block;
+    width: 70px;
+    text-align: right;
+}
+
+.timeline-aggregated-legend-swatch {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin: 0 6px;
+    position: relative;
+    top: 1px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.details {
+    color: rgb(48, 57, 66);
+    text-align: left;
+    font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+}
+
+    </style>
+    
+    <div class="card">
+
+      <h4>JavaScript Bundle Size</h4>
+      <paper-input "bs" value="{{bundleSize}}" label="Total JS bundle size (KB) - uncompressed"></paper-input> 
+      <small>[[computeGZippedSize(bundleSize)]]KB gzipped (estimate)</small>
+
+      <h4>Target Time To Interactive</h4>
+      <paper-input id="tti" value="{{timeToInteractive}}" label="Milliseconds"></paper-input>
+      
+      <div class="device-manager horizontal layout wrap">
+        <template is="dom-repeat" items="{{data}}">
+          <div class="device-entry">
+          <div><strong><span>[[item.name]]</span></strong></div>
+          <div><img src="images/[[item.image]]"/></div>
+
+          <div class="details">
+
+           <div>
+            <span class="timeline-aggregated-legend-value">[[computeSum(item.parse, item.eval, bundleSize, baseSize)]]ms</span>
+            <span class="timeline-aggregated-legend-swatch" style="background-color: rgb(243, 210, 124);"></span>            
+            <span class="timeline-aggregated-legend-title">Total Scripting</span>
+           </div>
+
+          <div>
+            <span class="timeline-aggregated-legend-value">[[computeValue(item.parse, bundleSize, baseSize)]]ms</span>
+            <span class="timeline-aggregated-legend-swatch" style="background-color: rgb(144, 194, 133);"></span>            
+            <span class="timeline-aggregated-legend-title">Parse</span>
+           </div>
+
+          <div>
+            <span class="timeline-aggregated-legend-value">[[computeValue(item.eval, bundleSize, baseSize)]]ms</span>
+            <span class="timeline-aggregated-legend-swatch" style="background-color: rgb(144, 183, 234);"></span>            
+            <span class="timeline-aggregated-legend-title">Eval</span>
+           </div>
+
+          <div>
+            <span class="timeline-aggregated-legend-value">[[computeTTIRemainder(item.parse, item.eval, timeToInteractive, bundleSize, baseSize)]]ms</span>
+            <span class="timeline-aggregated-legend-swatch" style="background-color: rgb(222, 222, 222);"></span>            
+            <span class="timeline-aggregated-legend-title">Budget remaining</span>
+           </div>
+           
+          </div>
+         
+          <progress max="[[timeToInteractive]]" value="[[computeSum(item.parse, item.eval, bundleSize, baseSize)]]">
+          </progress>
+
+         </div>
+       </template>
+      </div>
+
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view1',
+      properties: {
+        /* bundle size all computations are based on*/
+        /* http://test.patrickmeenan.com/jsparse/test.php?size=1048576 */
+        baseSize: {
+          type: Number,
+          value: 1048
+        },
+        /* custom bundle size to adjust for*/
+        bundleSize: {
+          type: Number,
+          value: 1200
+        },
+        timeToInteractive: {
+          type: Number,
+          value: 5000
+        }
+      },
+      ready: function() {
+        this.data = [{
+         "name": "Macbook Pro - Chrome",
+         "parse": 275.9,
+         "eval": 23.45,
+         "image": "macbook-pro.jpg"
+     },{
+         "name": "Moto G4 - Chrome",
+         "parse": 1429,
+         "eval": 73,
+         "image": "motog4.jpg"
+     },
+     {
+         "name": "Moto G1 - Chrome",
+         "parse": 2714.32,
+         "eval": 135.824,
+         "image": "motog-gen1.jpg"
+     },
+      {
+         "name": "Nexus 5 - Chrome",
+         "parse": 1834.46,
+         "eval": 200.435,
+         "image": "nexus5.jpg"
+     },{
+         "name": "iPhone 7 iOS 10 - Safari",
+         "parse": 76.78,
+         "eval": 72,
+         "image": "iphone-7.jpg"
+     },{
+         "name": "iPhone 6 iOS 9 - Safari",
+         "parse": 890,
+         "eval": 72,
+         "image": "iphone-6.jpg"
+     },{
+         "name": "iPhone 5c iOS 9 - Safari",
+         "parse": 1429,
+         "eval": 71,
+         "image": "iphone-5c.jpg"
+     }
+      ,{
+         "name": "PixelXL - Chrome",
+         "parse": 1114,
+         "eval": 40,
+         "image": "pixelxl.jpg"
+     },
+      {
+         "name": "Moto E - Chrome",
+         "parse": 2806.21,
+         "eval": 141.089,
+         "image": "moto-e.jpg"
+     },
+      {
+         "name": "Galaxy S7 - Chrome",
+         "parse": 956.16,
+         "eval": 31.654,
+         "image": "galaxy-s7.jpg"
+     },
+      {
+         "name": "Galaxy S5 - Chrome",
+         "parse": 2224.495,
+         "eval": 75.909,
+         "image": "galaxy-s5.jpg"
+     },
+      {
+         "name": "Nexus 7 - Chrome",
+         "parse": 3005.095,
+         "eval": 115.724,
+         "image": "nexus-7.jpg"
+     },
+      {
+         "name": "Thinkpad T430 - Chrome",
+         "parse": 290.51,
+         "eval": 40.545,
+         "image": "thinkpad-t430.jpg"
+     },
+      {
+         "name": "Thinkpad T430 - Firefox",
+         "parse": 165.205,
+         "eval": 7.634,
+         "image": "thinkpad-t430.jpg"
+     },
+      {
+         "name": "Thinkpad T430 - Microsoft Edge",
+         "parse": 384.795,
+         "eval": 1955.314,
+         "image": "thinkpad-t430.jpg"
+     },
+      {
+         "name": "Android One Airtel 3G",
+         "parse": 3092.525,
+         "eval": 140.824,
+         "image": "android-one.jpg"
+     }];
+      },
+
+      computeValue: function(time, bundleSize, baseSize) {
+        return Math.floor(time * (bundleSize/baseSize));
+      },
+      computeSum: function (parse, evaluate, bundleSize, baseSize) {
+        return Math.floor(parse * (bundleSize/baseSize)) + Math.floor(evaluate * (bundleSize/baseSize));
+      },
+      computeTTIRemainder: function (parse, evaluate, timeToInteractive, bundleSize, baseSize) {
+        return timeToInteractive - Math.floor(parse * (bundleSize/baseSize)) - Math.floor(evaluate * (bundleSize/baseSize));
+      },
+      computeGZippedSize: function(bundleSize) {
+          /*Pat Meenan estimated the JS bundle was ~250KB gzipped*/
+          return Math.floor(bundleSize * 0.25);
+      }
+    });
+  </script>
+</dom-module>
