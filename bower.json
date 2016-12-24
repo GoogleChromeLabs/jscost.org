@@ -17,7 +17,9 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#~1.1.0",
     "polymer": "Polymer/polymer#^1.6.0",
     "paper-input": "PolymerElements/paper-input#^1.1.22",
-    "paper-slider": "PolymerElements/paper-slider#^1.0.12"
+    "paper-slider": "PolymerElements/paper-slider#^1.0.12",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.4.3",
+    "paper-item": "PolymerElements/paper-item#^1.2.1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

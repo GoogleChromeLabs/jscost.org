@@ -12,6 +12,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<!-- <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html"> -->
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -81,17 +83,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
 }
 
+
     </style>
     
     <div class="card">
 
-      <h4>JavaScript Bundle Size</h4>
-      <paper-input value="{{bundleSize}}" label="Total JS bundle size (KB) - uncompressed"></paper-input> 
-      <small>[[computeGZippedSize(bundleSize)]]KB gzipped (estimate)</small>
+    <div class="container horizontal around-justified layout">
+      <div>
+        <h4>JavaScript Bundle Size</h4>
+        <paper-input value="{{bundleSize}}" label="Total JS bundle size (KB)"></paper-input> 
+        <small>[[computeGZippedSize(bundleSize)]]KB gzipped (estimate)</small>
+      </div>
 
-      <h4>Target Time To Interactive</h4>
-      <paper-input id="tti" value="{{timeToInteractive}}" label="Milliseconds"></paper-input>
-      
+      <div>
+        <h4>Download Speed</h4>
+        <paper-input id="speed" value="{{downloadSpeed}}" label="Download Speed (KBps)"></paper-input>
+        <small>[[computeDownloadTime(bundleSize, downloadSpeed)]] secs for [[computeGZippedSize(bundleSize)]]KB gz</small>
+      </div>
+    
+      <div>
+        <h4>Target Time To Interactive</h4>
+        <paper-input id="tti" value="{{timeToInteractive}}" label="Milliseconds"></paper-input>
+      </div>
+    </div>
+
+
+<!-- <paper-dropdown-menu label="Network conditions">
+  <paper-listbox class="dropdown-content">
+   <template is="dom-repeat" items="{{networkConditions}}">
+    <paper-item>[[item.title]]</paper-item>
+   </template>
+  </paper-listbox>
+</paper-dropdown-menu> -->
+
+
       <div class="device-manager horizontal layout wrap">
         <template is="dom-repeat" items="{{data}}">
           <div class="device-entry">
@@ -151,11 +176,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Number,
           value: 1200
         },
+        
         timeToInteractive: {
           type: Number,
           value: 5000
+        },
+        downloadSpeed: {
+          type: Number,
+          value: 750
         }
       },
+
       ready: function() {
         this.data = [{
          "name": "Macbook Pro - Chrome",
@@ -249,6 +280,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          "eval": 140.824,
          "image": "android-one.jpg"
      }];
+
+     this.networkConditions = [{
+        title: "GPRS",
+        download: 50, // 50kbps
+        latency: 500 // 500ms
+    },
+    {
+        title: "Regular 2G",
+        download: 250, // 250kbps
+        latency: 300 // 300ms
+    },
+    {
+        title: "Good 2G",
+        download: 450, // 450kbps
+        latency: 150 // 150ms
+    },
+    {
+        title: "Regular 3G",
+        download: 750, // 750kbps
+        latency: 100 // 100ms
+    },
+    {
+        title: "Good 3G",
+        download: 1500, // 1.5mbps
+        latency: 40 // 40ms
+    },
+    {
+        title: "Regular 4G",
+        download: 4000, // 4mbps
+        latency: 20 // 20ms
+    },
+    {
+        title: "DSL",
+        download: 2000, // 2mbps
+        latency: 5 // 5ms
+    },
+    {
+        title: "WiFi",
+        download: 30000, // 30mbps
+        latency: 2 // 2ms
+    }
+];
       },
 
       computeValue: function(time, bundleSize, baseSize) {
@@ -263,6 +336,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       computeGZippedSize: function(bundleSize) {
           /*Pat Meenan estimated the JS bundle was ~250KB gzipped*/
           return Math.floor(bundleSize * 0.25);
+      },
+      computeDownloadTime(bundleSize, downloadSpeed) {
+          var gzippedsize = this.computeGZippedSize(bundleSize);
+          return ((gzippedsize * 8) / downloadSpeed).toFixed(2);
       }
     });
   </script>
