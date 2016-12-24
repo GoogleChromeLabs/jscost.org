@@ -183,7 +183,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         downloadSpeed: {
           type: Number,
-          value: 750
+          value: 5000
         },
         // Download time in MS
         downloadTime: {
@@ -346,7 +346,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       computeDownloadTime(bundleSize, downloadSpeed) {
           let gzippedsize = this.computeGZippedSize(bundleSize);
-          return (((gzippedsize * 8) / downloadSpeed)*1000).toFixed(0);
+          return (((gzippedsize * 8) / downloadSpeed)*1000);
       }
     });
   </script>
