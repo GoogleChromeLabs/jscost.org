@@ -14,6 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <!-- <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html"> -->
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -83,6 +84,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
 }
 
+      iron-selector > * {
+        padding: 8px;
+      }
+
+      .iron-selected {
+        background-color: var(--google-blue-500);
+        color: white;
+      }
 
     </style>
     
@@ -108,6 +117,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 
 
+          <iron-selector selected="3" on-iron-select="selectDownloadSpeed">
+             <template is="dom-repeat" items="{{networkConditions}}">
+               <div data-download="[[item.download]]">[[item.title]]</div>
+             </template>
+          </iron-selector>
+          
 <!-- <paper-dropdown-menu label="Network conditions">
   <paper-listbox class="dropdown-content">
    <template is="dom-repeat" items="{{networkConditions}}">
@@ -346,7 +361,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       computeDownloadTime(bundleSize, downloadSpeed) {
           let gzippedsize = this.computeGZippedSize(bundleSize);
-          return (((gzippedsize * 8) / downloadSpeed)*1000);
+          return (((gzippedsize * 8) / downloadSpeed)*1000).toFixed(0);
+      },
+      selectDownloadSpeed: function(e) {
+          var download = e.detail.item.dataDownload;
+          this.downloadSpeed = download;
       }
     });
   </script>
