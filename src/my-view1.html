@@ -98,7 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div>
         <h4>Download Speed</h4>
         <paper-input id="speed" value="{{downloadSpeed}}" label="Download Speed (KBps)"></paper-input>
-        <small>[[computeDownloadTime(bundleSize, downloadSpeed)]] secs for [[computeGZippedSize(bundleSize)]]KB gz</small>
+        <small>[[computeDownloadTime(bundleSize, downloadSpeed)]]ms for [[computeGZippedSize(bundleSize)]]KB gz</small>
       </div>
     
       <div>
@@ -144,14 +144,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            </div>
 
           <div>
-            <span class="timeline-aggregated-legend-value">[[computeTTIRemainder(item.parse, item.eval, timeToInteractive, bundleSize, baseSize)]]ms</span>
+            <span class="timeline-aggregated-legend-value">[[computeTTIRemainder(item.parse, item.eval, timeToInteractive, bundleSize, baseSize, downloadTime)]]ms</span>
             <span class="timeline-aggregated-legend-swatch" style="background-color: rgb(222, 222, 222);"></span>            
             <span class="timeline-aggregated-legend-title">Budget remaining</span>
            </div>
            
           </div>
          
-          <progress max="[[timeToInteractive]]" value="[[computeSum(item.parse, item.eval, bundleSize, baseSize)]]">
+          <progress max="[[timeToInteractive]]" value="[[computeTimeSum(item.parse, item.eval, bundleSize, baseSize, downloadTime)]]">
           </progress>
 
          </div>
@@ -184,6 +184,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         downloadSpeed: {
           type: Number,
           value: 750
+        },
+        // Download time in MS
+        downloadTime: {
+            type: Number,
+            computed: 'computeDownloadTime(bundleSize, downloadSpeed)'
         }
       },
 
@@ -320,8 +325,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         title: "WiFi",
         download: 30000, // 30mbps
         latency: 2 // 2ms
-    }
-];
+    }];
       },
 
       computeValue: function(time, bundleSize, baseSize) {
@@ -330,16 +334,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       computeSum: function (parse, evaluate, bundleSize, baseSize) {
         return Math.floor(parse * (bundleSize/baseSize)) + Math.floor(evaluate * (bundleSize/baseSize));
       },
-      computeTTIRemainder: function (parse, evaluate, timeToInteractive, bundleSize, baseSize) {
-        return timeToInteractive - Math.floor(parse * (bundleSize/baseSize)) - Math.floor(evaluate * (bundleSize/baseSize));
+      computeTimeSum: function (parse, evaluate, bundleSize, baseSize, downloadTime) {
+        return (parseInt(downloadTime) + Math.floor(parse * (bundleSize/baseSize)) + Math.floor(evaluate * (bundleSize/baseSize)));
+      },
+      computeTTIRemainder: function (parse, evaluate, timeToInteractive, bundleSize, baseSize, downloadTime) {
+        return (timeToInteractive - downloadTime - Math.floor(parse * (bundleSize/baseSize)) - Math.floor(evaluate * (bundleSize/baseSize))).toFixed(0);
       },
       computeGZippedSize: function(bundleSize) {
           /*Pat Meenan estimated the JS bundle was ~250KB gzipped*/
           return Math.floor(bundleSize * 0.25);
       },
       computeDownloadTime(bundleSize, downloadSpeed) {
-          var gzippedsize = this.computeGZippedSize(bundleSize);
-          return ((gzippedsize * 8) / downloadSpeed).toFixed(2);
+          let gzippedsize = this.computeGZippedSize(bundleSize);
+          return (((gzippedsize * 8) / downloadSpeed)*1000).toFixed(0);
       }
     });
   </script>
