@@ -5,14 +5,7 @@
     <div>
       <label for='input_jsbundlesize'>JavaScript bundle size</label>
       <input v-model='bundleSize' id='input_jsbundlesize'>KB
-      <small>{{computeGZippedSize}}KB gzipped (estimate)</small>
-    </div>
-
-    <div class="toolbar-divider toolbar-item flex"></div>
-
-    <div>
-      <label for='input_tti'>Target Time-To-Interactive</label>
-      <input id='tti' v-model='timeToInteractive'>ms
+      <small class='blue'>{{computeGZippedSize}}KB gzipped (estimate)</small>
     </div>
 
     <div class="toolbar-divider toolbar-item flex"></div>
@@ -25,7 +18,14 @@
           </option>
         </select>
       <input v-model='downloadSpeed' id='input_downloadspeed'>Kbps
-      <small>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
+      <small class='blue'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
+    </div>
+
+    <div class="toolbar-divider toolbar-item flex"></div>
+
+    <div>
+      <label for='input_tti'>Target Time-To-Interactive</label>
+      <input id='tti' v-model='timeToInteractive'>ms
     </div>
 
     <div class="toolbar-divider toolbar-item flex"></div>
@@ -309,6 +309,11 @@ export default {
     overflow: visible;
     width: 100%;
     background-color: #f3f3f3;
+}
+
+/* Highlights */
+.blue {
+  color: blue;
 }
 
 /* Separator */
