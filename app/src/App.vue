@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <hello></hello>
+    <deviceManager></deviceManager>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import DeviceManager from './components/DeviceManager'
 
 export default {
   name: 'app',
   components: {
-    Hello
+    DeviceManager
   }
 }
 </script>
