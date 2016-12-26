@@ -60,7 +60,6 @@
     position: relative;
     display: flex;
     background-color: transparent;
-    flex: none;
     align-items: center;
     justify-content: center;
     padding: 0;

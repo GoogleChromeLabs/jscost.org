@@ -35,7 +35,7 @@
 
   <!--devices-->
   <div class='device-manager horizontal layout wrap'>
-    <div v-for='item in devices'>
+    <div v-for='item in devices' class='device-entry-container'>
       <div class='device-entry'>
         <div><strong><span>{{item.name}}</span></strong></div>
         <div><img :src='item.image' /></div>
@@ -157,5 +157,24 @@ export default {
 
 label {
   font-weight: 700;
+}
+
+/* Mobile styles */
+@media (max-width: 1250px) {
+  .tabbed-pane-header {
+    display: block;
+  }
+}
+
+@media (max-width: 450px) {
+  strong span {
+    font-size: 1.3em;
+  }
+  .device-entry-container {
+    margin: 0 auto;
+  }
+  input {
+    width: 35px;
+  }
 }
 </style>
