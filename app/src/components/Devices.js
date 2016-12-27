@@ -24,17 +24,17 @@ export default [{
   'eval': 200.435,
   'image': './static/nexus5.jpg'
 }, {
-  'name': 'iPhone 7 iOS 10 - Safari',
+  'name': 'iPhone 7 - Safari',
   'parse': 76.78,
   'eval': 72,
   'image': './static/iphone-7.jpg'
 }, {
-  'name': 'iPhone 6 iOS 9 - Safari',
+  'name': 'iPhone 6 - Safari',
   'parse': 645,
   'eval': 181,
   'image': './static/iphone-6.jpg'
 }, {
-  'name': 'iPhone 5c iOS 9 - Safari',
+  'name': 'iPhone 5c - Safari',
   'parse': 1429,
   'eval': 71,
   'image': './static/iphone-5c.jpg'
