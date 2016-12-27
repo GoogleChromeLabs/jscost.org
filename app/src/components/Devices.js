@@ -30,8 +30,8 @@ export default [{
   'image': './static/iphone-7.jpg'
 }, {
   'name': 'iPhone 6 iOS 9 - Safari',
-  'parse': 890,
-  'eval': 72,
+  'parse': 645,
+  'eval': 181,
   'image': './static/iphone-6.jpg'
 }, {
   'name': 'iPhone 5c iOS 9 - Safari',
@@ -175,4 +175,39 @@ export default [{
   'parse': 2326,
   'eval': 291,
   'image': './static/galaxy-a3.jpg'
+}, {
+  'name': 'OnePlus 3 - Chrome',
+  'parse': 1254,
+  'eval': 44,
+  'image': './static/oneplus-3.jpg'
+}, {
+  'name': 'Xiaomi Mi 4i - Chrome',
+  'parse': 2167,
+  'eval': 54,
+  'image': './static/xiaomi-mi-41.jpg'
+}, {
+  'name': 'Asus T00J Zenfone 5 - Chrome',
+  'parse': 6574,
+  'eval': 1346,
+  'image': './static/asus-zenfone-5.jpg'
+}, {
+  'name': 'Microsoft 640 Lumia 640 LTE - Edge',
+  'parse': 2377,
+  'eval': 186,
+  'image': './static/ms-640-lumia.jpg'
+}, {
+  'name': 'Apple iPhone 6s Plus',
+  'parse': 391,
+  'eval': 101,
+  'image': './static/iphone-6s-plus.jpg'
+}, {
+  'name': 'Apple iPhone 6s',
+  'parse': 408,
+  'eval': 101,
+  'image': './static/iphone-6s.jpg'
+}, {
+  'name': 'Apple iPhone 5s',
+  'parse': 1319,
+  'eval': 402,
+  'image': './static/iphone-5s.jpg'
 }]
