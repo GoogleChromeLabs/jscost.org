@@ -210,4 +210,19 @@ export default [{
   'parse': 1319,
   'eval': 402,
   'image': './static/iphone-5s.jpg'
+}, {
+  'name': 'Apple iPad',
+  'parse': 1033,
+  'eval': 264,
+  'image': './static/ipad.jpg'
+}, {
+  'name': 'Apple iPad Air',
+  'parse': 967,
+  'eval': 270,
+  'image': './static/ipad-air.jpg'
+}, {
+  'name': 'Apple iPad Air 2',
+  'parse': 679,
+  'eval': 169,
+  'image': './static/ipad-air-2.jpg'
 }]
