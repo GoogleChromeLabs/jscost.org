@@ -164,6 +164,12 @@ label {
   .tabbed-pane-header {
     display: block;
   }
+  .toolbar-divider {
+    display: none;
+  }
+  .controls div {
+    margin-bottom: 6px;
+  }
 }
 
 @media (max-width: 450px) {
@@ -175,6 +181,9 @@ label {
   }
   input {
     width: 35px;
+  }
+  .controls {
+    text-align: left;
   }
 }
 </style>
