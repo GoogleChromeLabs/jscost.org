@@ -225,4 +225,14 @@ export default [{
   'parse': 679,
   'eval': 169,
   'image': './static/ipad-air-2.jpg'
+}, {
+  'name': 'Moto G1 - Firefox 50',
+  'parse': 1317.669,
+  'eval': 68.03,
+  'image': './static/motog-gen1.jpg'
+}, {
+  'name': 'Nexus 5X - Firefox 50',
+  'parse': 434.849,
+  'eval': 24.425,
+  'image': './static/nexus5x.jpg'
 }]
