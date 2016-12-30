@@ -10,6 +10,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "devtools-timeline-model-browser": "^1.0.2",
     "vue": "^2.1.0"
   },
   "devDependencies": {
