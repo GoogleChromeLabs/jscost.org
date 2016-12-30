@@ -901,6 +901,10 @@ chokidar@^1.0.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
+chrome-devtools-frontend@1.0.434572:
+  version "1.0.434572"
+  resolved "https://registry.yarnpkg.com/chrome-devtools-frontend/-/chrome-devtools-frontend-1.0.434572.tgz#fa13cf9a83db717624b951059a7a02aac0cf1dc5"
+
 circular-json@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.3.1.tgz#be8b36aefccde8b3ca7aa2d6afc07a37242c0d2d"
@@ -1274,6 +1278,20 @@ detect-indent@^4.0.0:
   dependencies:
     repeating "^2.0.0"
 
+devtools-timeline-model-browser:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/devtools-timeline-model-browser/-/devtools-timeline-model-browser-1.0.2.tgz#24124375d350947f1d630a8a28ad43bcbd7bee3f"
+  dependencies:
+    chrome-devtools-frontend "1.0.434572"
+    devtools-timeline-model "https://github.com/paulirish/devtools-timeline-model#b3ff8a6a3f2e73a6f24774a5528588c07ab2f855"
+
+"devtools-timeline-model@https://github.com/paulirish/devtools-timeline-model#b3ff8a6a3f2e73a6f24774a5528588c07ab2f855":
+  version "1.1.6"
+  resolved "https://github.com/paulirish/devtools-timeline-model#b3ff8a6a3f2e73a6f24774a5528588c07ab2f855"
+  dependencies:
+    chrome-devtools-frontend "1.0.401423"
+    resolve "1.1.7"
+
 doctrine@^1.2.2:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-1.5.0.tgz#379dce730f6166f76cefa4e6707a159b02c5a6fa"
@@ -1467,7 +1485,7 @@ eslint-loader@^1.5.0:
     object-assign "^4.0.1"
     object-hash "^1.1.4"
 
-eslint-plugin-html@^1.3.0:
+eslint-plugin-html@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-html/-/eslint-plugin-html-1.7.0.tgz#2a5b03884d8d56adf9ad9864e9c036480fb629c9"
   dependencies:
@@ -3485,6 +3503,10 @@ resolve-from@^1.0.0:
 resolve@^1.1.6:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.2.0.tgz#9589c3f2f6149d1417a40becc1663db6ec6bc26c"
+
+resolve@1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.1.7.tgz#203114d82ad2c5ed9e8e0411b3932875e889e97b"
 
 restore-cursor@^1.0.1:
   version "1.0.1"
