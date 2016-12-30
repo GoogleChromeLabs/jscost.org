@@ -2,7 +2,7 @@
 <div class='container vertical around-justified layout'>
   <!-- controls -->
   <div class='horizontal controls tabbed-pane-header'>
-    <div>
+    <div class='controls-entry'>
       <label for='input_jsbundlesize'>JavaScript bundle size</label>
       <input v-model='bundleSize' id='input_jsbundlesize'>KB
       <small class='blue'>{{computeGZippedSize}}KB gzipped (estimate)</small>
@@ -10,7 +10,7 @@
 
     <div class="toolbar-divider toolbar-item flex"></div>
 
-    <div>
+    <div class='controls-entry'>
       <label for='input_downloadspeed'>Network</label>
         <select v-model='networkSelected' @change='changeNetwork'>
           <option v-for='option in network' v-bind:value='option.download'>
@@ -23,12 +23,16 @@
 
     <div class="toolbar-divider toolbar-item flex"></div>
 
-    <div>
-      <label for='input_tti'>Target Time-To-Interactive</label>
+    <div class='controls-entry'>
+      <label for='input_tti'>Time-To-Interactive</label>
       <input id='tti' v-model='timeToInteractive'>ms
     </div>
 
     <div class="toolbar-divider toolbar-item flex"></div>
+
+    <div class='controls-entry'>
+      <input type='file' id='selectFile' v-on:change='fileSelected'/>
+    </div>
   </div>
   <!--/controls -->
 
@@ -65,6 +69,42 @@
             <span class='timeline-aggregated-legend-title'>TTI Budget remaining</span>
           </div>
 
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'JS Frame')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>JS Frame</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Major GC')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Major GC</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Minor GC')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Minor GC</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Run Microtasks')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Microtasks</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Compile Script')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Compile Script</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Evaluate Script')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Evaluate Script</span>
+          </div>
+
         </div>
 
         <progress :max='timeToInteractive' :value='computeTimeSum(item)'>
@@ -76,6 +116,7 @@
 </template>
 
 <script>
+/* global FileReader */
 import deviceConfig from './Devices.js'
 import networkConditions from './Network.js'
 
@@ -89,7 +130,12 @@ export default {
       downloadSpeed: 30000,
       devices: deviceConfig,
       network: networkConditions,
-      networkSelected: '30000'
+      networkSelected: '30000',
+      // custom trace multipliers
+      traceParseTime: 1,
+      traceEvalTime: 1,
+      // Experiment
+      traceStats: new Map()
     }
   },
   methods: {
@@ -97,8 +143,65 @@ export default {
       this.downloadSpeed = this.networkSelected
     },
 
+    getRelativeParse (deviceParseTime) {
+      if (this.traceParseTime === 1) { return deviceParseTime }
+      // Trace assumes you've profiled on something like a desktop macbook,
+      // so we'll use that as a the baseline for multiplication
+      // Another thing is we technically could factor in the ENTIRE cost of root.
+      var baselineParseTime = deviceConfig[0].parse
+      var relativeParseTime = (this.traceParseTime / baselineParseTime).toFixed(2)
+      return deviceParseTime * relativeParseTime
+    },
+
+    getRelativeEval (deviceEvalTime) {
+      // if (this.traceEvalTime === 1) { return deviceEvalTime }
+      // var baselineEvalTime = deviceConfig[0].eval
+      // var relativeEvalTime = (baselineEvalTime / this.traceEvalTime).toFixed(2)
+      // return deviceEvalTime * relativeEvalTime
+      if (this.traceEvalTime === 1) { return deviceEvalTime }
+      var baselineEvalTime = deviceConfig[0].eval
+      var relativeEvalTime = (this.traceEvalTime / baselineEvalTime).toFixed(2)
+      return deviceEvalTime * relativeEvalTime
+    },
+
+    estimateDeviceTotalyScriptingTime (item) {
+      // ...
+    },
+
+    // Experiment
+    estimateDeviceStatsFromTrace (item, key) {
+      // TODO: We may not need the other get relatives....
+      // Assume the trace was taken on a high-end desktop, like an MBP
+      // Let's first calculate how much time the default benchmark spends
+      // in script for that device. We'll use this as a relative weight.
+      var totalScriptingBaseline = deviceConfig[0].parse + deviceConfig[0].eval
+      // Next, what's the total time in script for the current device?
+      var totalScriptingForDevice = item.parse + item.eval
+      // Calculate multiplier relative to the mbp scores as they're the same app
+      // var multiplier = (totalScriptingForDevice / totalScriptingBaseline).toFixed(2)
+      var multiplier = (parseInt(this.traceStats.get(key), 10) / totalScriptingBaseline).toFixed(2)
+      // Adjust device stats and trace stats based on this multiplier
+      return (totalScriptingForDevice * multiplier).toFixed(2)
+
+      // Stats from the processed trace
+      // this.JSFrame = parseInt(traceStats.get('JS Frame'), 10) * multiplier
+      // this.CompileScript = parseInt(traceStats.get('Compile Script'), 10) * multiplier
+      // this.Layout = parseInt(traceStats.get('Layout'), 10) * multiplier
+      // this.MajorGC = parseInt(traceStats.get('Major GC'), 10) * multiplier
+      // this.parseHTML = parseInt(traceStats.get('Parse HTML'), 10) * multiplier
+      // this.RecalcStyles = parseInt(traceStats.get('Parse HTML'), 10) * multiplier
+      // this.MinorGC = parseInt(traceStats.get('Minor GC'), 10) * multiplier
+      // this.EvaluateScript = parseInt(traceStats.get('Evaluate Script'), 10) * multiplier
+      // this.RunMicrotasks = parseInt(traceStats.get('Run Microtasks'), 10) * multiplier
+      // this.UpdateLayerTree = parseInt(traceStats.get('Layer Tree'), 10) * multiplier
+      // this.DOMGC = parseInt(traceStats.get('DOM GC'), 10) * multiplier
+      // this.Paint = parseInt(traceStats.get('Paint'), 10) * multiplier
+      // this.ParseStylesheet = parseInt(traceStats.get('Parse Stylesheet'), 10) * multiplier
+    },
+    // End experiment
+
     computeSum (item) {
-      return Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize))
+      return Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) + Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))
     },
 
     computeValue (field, item) {
@@ -106,11 +209,43 @@ export default {
     },
 
     computeTimeSum (item) {
-      return (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize))).toFixed(0)
+      return (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) + Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))).toFixed(0)
     },
 
     computeTTIRemainder (item) {
-      return (this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSize / this.baseSize)) - Math.floor(item.eval * (this.bundleSize / this.baseSize))).toFixed(0)
+      return (this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) - Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))).toFixed(0)
+    },
+    // Handle trace selection
+    fileSelected (e) {
+      var files = e.target.files
+      var file = files[0]
+      var reader = new FileReader()
+      reader.onload = function (e) {
+        this.reportTraceContent(e.target.result, 'trace')
+      }.bind(this)
+      reader.readAsText(file)
+    },
+    reportTraceContent (trace, filename) {
+      require(['devtools-timeline-model-browser'], (d) => {
+        var model = new window.TimelineModelBrowser(trace)
+        var bottomUpByName = model.bottomUpGroupBy('EventName')
+        var tree = this.dumpTree(bottomUpByName, 'selfTime')
+        // Bottom up tree grouped by EventName
+        var root = tree['_c']
+        // TODO: Clean up all debugging from the trace report
+        console.log(root)
+
+        this.traceParseTime = parseInt(root.get('Compile Script'), 10)
+        this.traceEvalTime = parseInt(root.get('Evaluate Script'), 10)
+
+        // Most expensive costs include JS Frame, Major GC, minor GC. How can we include?
+        this.traceStats = root
+      })
+    },
+    dumpTree (tree, timeValue) {
+      var result = new Map()
+      tree.children.forEach((value, key) => result.set(key, value[timeValue].toFixed(1)))
+      return result
     }
   },
 
@@ -136,7 +271,7 @@ export default {
 }
 
 .device-entry {
-  height: 280px;
+  height: 320px;
   padding: 10px;
   text-align: center;
   display: block;
@@ -148,7 +283,11 @@ export default {
 }
 
 .controls {
-  padding: 5px 0px 0px 5px;
+  padding: 5px 0px 0px 0px;
+}
+
+.controls-entry {
+  margin-left: 2px;
 }
 
 .controls .flex {
