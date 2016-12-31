@@ -44,6 +44,8 @@
         <div><strong><span>{{item.name}}</span></strong></div>
         <div><img :src='item.image' /></div>
 
+<!-- Template for synthetic benchmark -->
+<template v-if="traceStats.get('JS Frame') === undefined">
         <div class='details'>
           <div>
             <span class='timeline-aggregated-legend-value'>{{computeSum(item)}}ms</span>
@@ -69,6 +71,17 @@
             <span class='timeline-aggregated-legend-title'>TTI Budget remaining</span>
           </div>
 
+         <progress :max='timeToInteractive' :value='computeTimeSum(item)'>
+        </progress>         
+</template>
+<!-- A user supplied trace will toggle the more detailed view -->
+<template v-else-if="traceStats.get('JS Frame') > 0">
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceTotalScriptingTime(item)}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
+            <span class='timeline-aggregated-legend-title'>Total Scripting</span>
+          </div>
+          
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'JS Frame')}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
@@ -105,10 +118,16 @@
             <span class='timeline-aggregated-legend-title'>Evaluate Script</span>
           </div>
 
-        </div>
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceTotalTTIRemaining(item)}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>TTI Budget Remaining</span>
+          </div>
 
-        <progress :max='timeToInteractive' :value='computeTimeSum(item)'>
+        <progress :max='timeToInteractive' :value='estimateDeviceTimeSum(item)'>
         </progress>
+</template>
+        </div>
 
       </div>
  </div>
@@ -164,8 +183,22 @@ export default {
       return deviceEvalTime * relativeEvalTime
     },
 
-    estimateDeviceTotalyScriptingTime (item) {
+    estimateDeviceTotalScriptingTime (item) {
       // ...
+      var JSFrame = this.estimateDeviceStatsFromTrace(item, 'JS Frame')
+      var CompileScript = this.estimateDeviceStatsFromTrace(item, 'Compile Script')
+      var EvaluateScript = this.estimateDeviceStatsFromTrace(item, 'Evaluate Script')
+      var MajorGC = this.estimateDeviceStatsFromTrace(item, 'Major GC')
+      var MinorGC = this.estimateDeviceStatsFromTrace(item, 'Minor GC')
+      return parseInt(JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC, 10).toFixed(2)
+    },
+
+    estimateDeviceTotalTTIRemaining (item) {
+      return (this.timeToInteractive - this.estimateDeviceTimeSum(item)).toFixed(2)
+    },
+
+    estimateDeviceTimeSum (item) {
+      return ((((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000)) + this.estimateDeviceTotalScriptingTime(item) * (this.bundleSize / this.baseSize))
     },
 
     // Experiment
@@ -271,7 +304,7 @@ export default {
 }
 
 .device-entry {
-  height: 320px;
+  height: 400px;
   padding: 10px;
   text-align: center;
   display: block;
