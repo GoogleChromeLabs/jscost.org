@@ -1,3 +1,7 @@
+<!--
+  TODO: For custom trace mode, figure out treatment of the
+  bundle size/network. Should we extract total script size?
+-->
 <template>
 <div class='container vertical around-justified layout'>
   <!-- controls -->
@@ -56,13 +60,13 @@
           <div>
             <span class='timeline-aggregated-legend-value'>{{computeValue('parse', item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
-            <span class='timeline-aggregated-legend-title'>Parse Script</span>
+            <span class='timeline-aggregated-legend-title'>Parse</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{computeValue('eval',item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
-            <span class='timeline-aggregated-legend-title'>Evaluate Script</span>
+            <span class='timeline-aggregated-legend-title'>Evaluate</span>
           </div>
 
           <div>
@@ -86,37 +90,37 @@
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'JS Frame')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: #EFB320;'></span>
             <span class='timeline-aggregated-legend-title'>JS Frame</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Compile Script')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color:#90C285;'></span>
             <span class='timeline-aggregated-legend-title'>Parse</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Evaluate Script')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA;'></span>
             <span class='timeline-aggregated-legend-title'>Evaluate</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Major GC')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: #ECC6E1;'></span>
             <span class='timeline-aggregated-legend-title'>Major GC</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Minor GC')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: #ECC6E1;'></span>
             <span class='timeline-aggregated-legend-title'>Minor GC</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Run Microtasks')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: #AAAAAA;'></span>
             <span class='timeline-aggregated-legend-title'>Microtasks</span>
           </div>
 
