@@ -70,22 +70,36 @@
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
             <span class='timeline-aggregated-legend-title'>TTI Budget remaining</span>
           </div>
+          </div>
 
          <progress :max='timeToInteractive' :value='computeTimeSum(item)'>
         </progress>         
 </template>
 <!-- A user supplied trace will toggle the more detailed view -->
 <template v-else-if="traceStats.get('JS Frame') > 0">
+    <div class='details'>
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceTotalScriptingTime(item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
             <span class='timeline-aggregated-legend-title'>Total Scripting</span>
           </div>
-          
+
           <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'JS Frame')}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
             <span class='timeline-aggregated-legend-title'>JS Frame</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Compile Script')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Parse</span>
+          </div>
+
+          <div>
+            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Evaluate Script')}}ms</span>
+            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+            <span class='timeline-aggregated-legend-title'>Evaluate</span>
           </div>
 
           <div>
@@ -107,27 +121,15 @@
           </div>
 
           <div>
-            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Compile Script')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
-            <span class='timeline-aggregated-legend-title'>Compile Script</span>
-          </div>
-
-          <div>
-            <span class='timeline-aggregated-legend-value'>{{estimateDeviceStatsFromTrace(item, 'Evaluate Script')}}ms</span>
-            <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
-            <span class='timeline-aggregated-legend-title'>Evaluate Script</span>
-          </div>
-
-          <div>
             <span class='timeline-aggregated-legend-value'>{{estimateDeviceTotalTTIRemaining(item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
             <span class='timeline-aggregated-legend-title'>TTI Budget Remaining</span>
           </div>
-
+</div>
         <progress :max='timeToInteractive' :value='estimateDeviceTimeSum(item)'>
         </progress>
 </template>
-        </div>
+        
 
       </div>
  </div>
@@ -150,37 +152,13 @@ export default {
       devices: deviceConfig,
       network: networkConditions,
       networkSelected: '30000',
-      // custom trace multipliers
-      traceParseTime: 1,
-      traceEvalTime: 1,
-      // Experiment
+      // Custom trace supplied
       traceStats: new Map()
     }
   },
   methods: {
     changeNetwork () {
       this.downloadSpeed = this.networkSelected
-    },
-
-    getRelativeParse (deviceParseTime) {
-      if (this.traceParseTime === 1) { return deviceParseTime }
-      // Trace assumes you've profiled on something like a desktop macbook,
-      // so we'll use that as a the baseline for multiplication
-      // Another thing is we technically could factor in the ENTIRE cost of root.
-      var baselineParseTime = deviceConfig[0].parse
-      var relativeParseTime = (this.traceParseTime / baselineParseTime).toFixed(2)
-      return deviceParseTime * relativeParseTime
-    },
-
-    getRelativeEval (deviceEvalTime) {
-      // if (this.traceEvalTime === 1) { return deviceEvalTime }
-      // var baselineEvalTime = deviceConfig[0].eval
-      // var relativeEvalTime = (baselineEvalTime / this.traceEvalTime).toFixed(2)
-      // return deviceEvalTime * relativeEvalTime
-      if (this.traceEvalTime === 1) { return deviceEvalTime }
-      var baselineEvalTime = deviceConfig[0].eval
-      var relativeEvalTime = (this.traceEvalTime / baselineEvalTime).toFixed(2)
-      return deviceEvalTime * relativeEvalTime
     },
 
     estimateDeviceTotalScriptingTime (item) {
@@ -190,15 +168,15 @@ export default {
       var EvaluateScript = this.estimateDeviceStatsFromTrace(item, 'Evaluate Script')
       var MajorGC = this.estimateDeviceStatsFromTrace(item, 'Major GC')
       var MinorGC = this.estimateDeviceStatsFromTrace(item, 'Minor GC')
-      return parseInt(JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC, 10).toFixed(2)
+      return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
     estimateDeviceTotalTTIRemaining (item) {
-      return (this.timeToInteractive - this.estimateDeviceTimeSum(item)).toFixed(2)
+      return Math.floor(this.timeToInteractive - this.estimateDeviceTimeSum(item)).toFixed(0)
     },
 
     estimateDeviceTimeSum (item) {
-      return ((((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000)) + this.estimateDeviceTotalScriptingTime(item) * (this.bundleSize / this.baseSize))
+      return Math.floor((((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000)) + this.estimateDeviceTotalScriptingTime(item) * (this.bundleSize / this.baseSize)).toFixed(0)
     },
 
     // Experiment
@@ -214,7 +192,7 @@ export default {
       // var multiplier = (totalScriptingForDevice / totalScriptingBaseline).toFixed(2)
       var multiplier = (parseInt(this.traceStats.get(key), 10) / totalScriptingBaseline).toFixed(2)
       // Adjust device stats and trace stats based on this multiplier
-      return (totalScriptingForDevice * multiplier).toFixed(2)
+      return Math.floor(totalScriptingForDevice * multiplier)
 
       // Stats from the processed trace
       // this.JSFrame = parseInt(traceStats.get('JS Frame'), 10) * multiplier
@@ -234,7 +212,7 @@ export default {
     // End experiment
 
     computeSum (item) {
-      return Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) + Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))
+      return Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize))
     },
 
     computeValue (field, item) {
@@ -242,11 +220,11 @@ export default {
     },
 
     computeTimeSum (item) {
-      return (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) + Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))).toFixed(0)
+      return Math.floor(((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize)))
     },
 
     computeTTIRemainder (item) {
-      return (this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(this.getRelativeParse(item.parse) * (this.bundleSize / this.baseSize)) - Math.floor(this.getRelativeEval(item.eval) * (this.bundleSize / this.baseSize))).toFixed(0)
+      return Math.floor(this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSize / this.baseSize)) - Math.floor(item.eval * (this.bundleSize / this.baseSize))).toFixed(0)
     },
     // Handle trace selection
     fileSelected (e) {
@@ -264,15 +242,7 @@ export default {
         var bottomUpByName = model.bottomUpGroupBy('EventName')
         var tree = this.dumpTree(bottomUpByName, 'selfTime')
         // Bottom up tree grouped by EventName
-        var root = tree['_c']
-        // TODO: Clean up all debugging from the trace report
-        console.log(root)
-
-        this.traceParseTime = parseInt(root.get('Compile Script'), 10)
-        this.traceEvalTime = parseInt(root.get('Evaluate Script'), 10)
-
-        // Most expensive costs include JS Frame, Major GC, minor GC. How can we include?
-        this.traceStats = root
+        this.traceStats = tree['_c']
       })
     },
     dumpTree (tree, timeValue) {
@@ -329,6 +299,10 @@ export default {
 
 label {
   font-weight: 700;
+}
+
+.details {
+  text-align: left;
 }
 
 /* Mobile styles */
