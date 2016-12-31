@@ -56,13 +56,13 @@
           <div>
             <span class='timeline-aggregated-legend-value'>{{computeValue('parse', item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
-            <span class='timeline-aggregated-legend-title'>Parse</span>
+            <span class='timeline-aggregated-legend-title'>Parse Script</span>
           </div>
 
           <div>
             <span class='timeline-aggregated-legend-value'>{{computeValue('eval',item)}}ms</span>
             <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
-            <span class='timeline-aggregated-legend-title'>Eval</span>
+            <span class='timeline-aggregated-legend-title'>Evaluate Script</span>
           </div>
 
           <div>
