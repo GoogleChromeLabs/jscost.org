@@ -204,6 +204,17 @@ export default {
 
     estimateDeviceTotalTTIRemaining (item) {
       return Math.floor(this.timeToInteractive - this.estimateDeviceTimeSum(item)).toFixed(0)
+    /*
+      Compute the total time spent in script across JS Frame (CPU), Compile, Eval,
+      Minor and Major GC events.
+    */
+    getCustomTraceTotalScriptingTime (item) {
+      var JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
+      var CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
+      var EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
+      var MajorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Major GC')
+      var MinorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Minor GC')
+      return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
     getCustomTraceParseHTMLCSSTime () {
