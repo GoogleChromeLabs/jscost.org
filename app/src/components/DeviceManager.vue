@@ -185,6 +185,10 @@ export default {
       return e.categoriesString.includes('blink.user_timing') && e.name === 'navigationStart'
     },
 
+    _filterEventsForLoadEventEnd (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd'
+    },
+
     },
 
     estimateDeviceTotalTTIRemaining (item) {
