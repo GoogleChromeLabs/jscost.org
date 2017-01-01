@@ -207,8 +207,10 @@ export default {
       return Math.floor(this.timeToInteractive - this.estimateDeviceTimeSum(item)).toFixed(0)
     },
 
-    estimateDeviceTimeSum (item) {
-      return Math.floor((((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000)) + this.estimateDeviceTotalScriptingTime(item) * (this.bundleSize / this.baseSize)).toFixed(0)
+    getCustomTraceParseHTMLCSSTime () {
+      var traceParseHTML = parseInt(this.traceStats.get('Parse HTML'), 10)
+      var traceParseCSS = parseInt(this.traceStats.get('Parse Stylesheet'), 10)
+      return (traceParseHTML + traceParseCSS).toFixed(0)
     },
 
     // Experiment
