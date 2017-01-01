@@ -8,8 +8,8 @@
     <div class='horizontal controls tabbed-pane-header'>
 
       <div class='controls-entry js-bundle-size'>
-        <label for='input_jsbundlesize'>JavaScript Bundle Size</label>
-        <input v-model='bundleSize' id='input_jsbundlesize'>KB
+        <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
+        <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget'>KB
         <small class='blue'>{{computeGZippedSize}}KB gzipped</small>
       </div>
 
@@ -30,7 +30,7 @@
 
       <div class='controls-entry time-to-interactive'>
         <label for='input_tti'>Time-To-Interactive</label>
-        <input id='tti' v-model='timeToInteractive'>ms
+        <input id='tti' v-model='timeToInteractiveBudget'>ms
       </div>
 
       <div class="toolbar-divider toolbar-item flex"></div>
@@ -80,7 +80,7 @@
               </div>
             </div>
 
-            <progress :max='timeToInteractive' :value='computeTimeSum(item)'>
+            <progress :max='timeToInteractiveBudget' :value='computeTimeSum(item)'>
             </progress>
           </template>
           <!-- A user supplied trace will toggle the more detailed view -->
@@ -98,27 +98,27 @@
                 <span class='timeline-aggregated-legend-title'>JS Frame</span>
               </div>
 
-              <div>
+              <div><!--#F3C75C-->
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Compile Script')}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color:#90C285;'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
                 <span class='timeline-aggregated-legend-title'>Parse</span>
               </div>
 
-              <div>
+              <div><!--#F4CE71-->
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA;'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
                 <span class='timeline-aggregated-legend-title'>Evaluate</span>
               </div>
 
               <div>
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Major GC')}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #ECC6E1;'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
                 <span class='timeline-aggregated-legend-title'>Major GC</span>
               </div>
 
               <div>
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Minor GC')}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #ECC6E1;'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
                 <span class='timeline-aggregated-legend-title'>Minor GC</span>
               </div>
 
@@ -130,21 +130,23 @@
 
               <div>
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceParseHTMLCSSTime(item)}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: #A4C4ED'></span>
                 <span class='timeline-aggregated-legend-title'>Parse HTML/CSS</span>
               </div>
-
+              <!--
               <div>
                 <span class='timeline-aggregated-legend-value'>{{customTraceDOMCompleteTime}}ms</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #AAAAAA;'></span>
                 <span class='timeline-aggregated-legend-title'>DOM Complete</span>
               </div>
-
+              -->
+              <!--
               <div>
                 <span class='timeline-aggregated-legend-value'>{{customTraceLoadingTime}}ms</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA'></span>
                 <span class='timeline-aggregated-legend-title'>Load (original trace)</span>
               </div>
+              -->
 
               <div>
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimatedNetworkTransferTime()}}ms</span>
@@ -162,12 +164,12 @@
               -->
               <div>
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimatedTTIRemaining(item)}}ms</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #32C2FE'></span>
+                <span class='timeline-aggregated-legend-swatch' style='background-color: #CCDEF5'></span>
                 <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
               </div>
 
             </div>
-            <progress :max='timeToInteractive' :value='getCustomTraceSumOfTimeSpent(item)'>
+            <progress :max='timeToInteractiveBudget' :value='getCustomTraceSumOfTimeSpent(item)'>
             </progress>
           </template>
 
@@ -186,12 +188,15 @@ export default {
   name: 'jscost',
   data () {
     return {
+      /* -- Budgets -- */
       /* All synthetic benchmark timings are based on time to run 1048KB of 'average' JS */
       baseSize: 1048,
       /* Default JS bundle size target for the synthetic benchmark */
-      bundleSize: 1200,
+      bundleSizeBudget: 1200,
       /* Target time the app should be interactive in. Chrome suggests < 5000ms */
-      timeToInteractive: 5000,
+      timeToInteractiveBudget: 5000,
+      /* Scripting budget (Parse/Eval primarily) */
+      scriptingBudget: 3500,
       /* Most developers are testing on desktop with a fast connection. */
       /* Default to DevTools Wifi configuration that most traces will likely be based on */
       downloadSpeed: 30000,
@@ -273,11 +278,11 @@ export default {
     },
 
     getCustomTraceEstimatedTTIRemaining (item) {
-      return Math.floor(this.timeToInteractive - this.getCustomTraceSumOfTimeSpent(item)).toFixed(0)
+      return Math.floor(this.timeToInteractiveBudget - this.getCustomTraceSumOfTimeSpent(item)).toFixed(0)
     },
 
     getCustomTraceEstimatedNetworkTransferTime () {
-      return this.calculateTransferRate(this.bundleSize / 1000, this.downloadSpeed / 1000)
+      return this.calculateTransferRate(this.bundleSizeBudget / 1000, this.downloadSpeed / 1000)
     },
 
     // WIP
@@ -287,19 +292,19 @@ export default {
     },
 
     computeSum (item) {
-      return Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize))
+      return Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) + Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize))
     },
 
     computeValue (field, item) {
-      return Math.floor(item[field] * (this.bundleSize / this.baseSize))
+      return Math.floor(item[field] * (this.bundleSizeBudget / this.baseSize))
     },
 
     computeTimeSum (item) {
-      return Math.floor(((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(item.parse * (this.bundleSize / this.baseSize)) + Math.floor(item.eval * (this.bundleSize / this.baseSize)))
+      return Math.floor(((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) + Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize)))
     },
 
     computeTTIRemainder (item) {
-      return Math.floor(this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSize / this.baseSize)) - Math.floor(item.eval * (this.bundleSize / this.baseSize))).toFixed(0)
+      return Math.floor(this.timeToInteractiveBudget - (((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) - Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize))).toFixed(0)
     },
 
     isCustomTraceSupplied () {
@@ -338,7 +343,7 @@ export default {
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
         this.customTraceLoadingTime = Math.floor(loadEventEnd[0].startTime - navStart[0].startTime)
 
-        this.bundleSize = (this.customTraceLoadingTime / 80) * 300
+        this.bundleSizeBudget = (this.customTraceLoadingTime / 80) * 300
 
         // Finally hint to UI that a custom trace was supplied
         this.hasCustomTrace = true
@@ -353,10 +358,10 @@ export default {
 
   computed: {
     computeGZippedSize () {
-      return Math.floor(this.bundleSize * 0.25)
+      return Math.floor(this.bundleSizeBudget * 0.25)
     },
     computeDownloadTime () {
-      return ((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)
+      return ((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)
     }
   }
 }
