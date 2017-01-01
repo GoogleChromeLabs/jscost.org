@@ -149,15 +149,22 @@ export default {
   name: 'jscost',
   data () {
     return {
+      /* All synthetic benchmark timings are based on time to run 1048KB of 'average' JS */
       baseSize: 1048,
+      /* Default JS bundle size target for the synthetic benchmark */
       bundleSize: 1200,
+      /* Target time the app should be interactive in. Chrome suggests < 5000ms */
       timeToInteractive: 5000,
+      /* Most developers are testing on desktop with a fast connection. */
+      /* Default to DevTools Wifi configuration that most traces will likely be based on */
       downloadSpeed: 30000,
       devices: deviceConfig,
       network: networkConditions,
       networkSelected: '30000',
-      // Custom trace supplied
-      traceStats: new Map()
+      /* If a custom trace is selected, store the trace stats */
+      traceStats: new Map(),
+      /* Only truthy when a valid custom trace was supplied */
+      hasCustomTrace: false
     }
   },
   methods: {
