@@ -180,6 +180,11 @@ export default {
       var MajorGC = this.estimateDeviceStatsFromTrace(item, 'Major GC')
       var MinorGC = this.estimateDeviceStatsFromTrace(item, 'Minor GC')
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
+    /* Trace helpers */
+    _filterEventsForNavStart (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'navigationStart'
+    },
+
     },
 
     estimateDeviceTotalTTIRemaining (item) {
