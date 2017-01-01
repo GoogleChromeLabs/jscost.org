@@ -247,6 +247,17 @@ export default {
         var tree = this.dumpTree(bottomUpByName, 'selfTime')
         // Bottom up tree grouped by EventName
         this.traceStats = tree['_c']
+        // Compute loading durations
+        var events = model.timelineModel().mainThreadEvents()
+        var domLoading = events.filter(this._filterEventsForDomLoading)
+        var domComplete = events.filter(this._filterEventsForDomComplete)
+        var domInteractive = events.filter(this._filterEventsForDomInteractive)
+        var navStart = events.filter(this._filterEventsForNavStart)
+        var loadEventEnd = events.filter(this._filterEventsForLoadEventEnd)
+
+        this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
+        this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
+        this.customTraceLoadingTime = Math.floor(loadEventEnd[0].startTime - navStart[0].startTime)
       })
     },
     dumpTree (tree, timeValue) {
