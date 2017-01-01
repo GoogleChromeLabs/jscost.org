@@ -258,6 +258,9 @@ export default {
         this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
         this.customTraceLoadingTime = Math.floor(loadEventEnd[0].startTime - navStart[0].startTime)
+
+        this.bundleSize = (this.customTraceLoadingTime / 80) * 300
+
       })
     },
     dumpTree (tree, timeValue) {
