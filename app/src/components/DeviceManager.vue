@@ -73,7 +73,7 @@
                 <span class='timeline-aggregated-legend-title'>Evaluate</span>
               </div>
 
-              <div>
+              <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{computeTTIRemainder(item)}}ms</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
                 <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
@@ -162,7 +162,7 @@
                       <span class='timeline-aggregated-legend-title'>Finish Loading</span>
                     </div>
               -->
-              <div>
+              <div v-bind:class="{ 'over-budget': isCustomTraceOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimatedTTIRemaining(item)}}ms</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #CCDEF5'></span>
                 <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
@@ -212,6 +212,14 @@ export default {
   methods: {
     changeNetworkSpeed () {
       this.downloadSpeed = this.networkSelected
+    },
+
+    isCustomTraceOverTTIBudget (item) {
+      return (this.getCustomTraceEstimatedTTIRemaining(item) < -1)
+    },
+
+    isBenchmarkOverTTIBudget (item) {
+      return (this.computeTTIRemainder(item) < -1)
     },
 
     /* Trace helpers */
@@ -415,6 +423,10 @@ label {
 
 .details {
   text-align: left;
+}
+
+.over-budget {
+  background-color: rgb(255, 215, 215);
 }
 
 /* Mobile styles */
