@@ -1,22 +1,21 @@
-<!--
-  TODO: For custom trace mode, figure out treatment of the
-  bundle size/network. Should we extract total script size?
--->
 <template>
-<div class='container vertical around-justified layout'>
-  <!-- controls -->
-  <div class='horizontal controls tabbed-pane-header'>
-    <div class='controls-entry'>
-      <label for='input_jsbundlesize'>JavaScript bundle size</label>
-      <input v-model='bundleSize' id='input_jsbundlesize'>KB
-      <small class='blue'>{{computeGZippedSize}}KB gzipped (estimate)</small>
-    </div>
+  <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
-    <div class="toolbar-divider toolbar-item flex"></div>
+    <!--
+      @name: DeviceManagerControls
+      @description: Configure the bundle size, network and TTI settings
+    -->
+    <div class='horizontal controls tabbed-pane-header'>
 
-    <div class='controls-entry'>
-      <label for='input_downloadspeed'>Network</label>
-        <select v-model='networkSelected' @change='changeNetwork'>
+      <div class='controls-entry js-bundle-size'>
+        <label for='input_jsbundlesize'>JavaScript Bundle Size</label>
+        <input v-model='bundleSize' id='input_jsbundlesize'>KB
+        <small class='blue'>{{computeGZippedSize}}KB gzipped</small>
+      </div>
+
+      <div class="toolbar-divider toolbar-item flex"></div>
+
+      <div class='controls-entry change-network-speed'>
           <option v-for='option in network' v-bind:value='option.download'>
             {{ option.title }}
           </option>
@@ -338,10 +337,18 @@ export default {
 }
 
 .device-entry {
-  height: 400px;
+  height: 240px;
   padding: 10px;
   text-align: center;
   display: block;
+}
+
+.hasCustomTrace .device-entry {
+  height: 400px;
+}
+
+.hasCustomTrace .js-bundle-size, .hasCustomTrace .gzip-preview {
+  display: none;
 }
 
 .device-entry img {
