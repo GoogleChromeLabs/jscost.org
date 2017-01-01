@@ -189,6 +189,18 @@ export default {
       return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd'
     },
 
+    _filterEventsForDomLoading (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'domLoading'
+    },
+
+    _filterEventsForDomComplete (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'domComplete'
+    },
+
+    _filterEventsForDomInteractive (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'domInteractive'
+    },
+
     },
 
     estimateDeviceTotalTTIRemaining (item) {
