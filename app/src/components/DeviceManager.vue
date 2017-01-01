@@ -200,6 +200,8 @@ export default {
       return e.categoriesString.includes('blink.user_timing') && e.name === 'domInteractive'
     },
 
+    _filterEventsForFirstTextPaint (e) {
+      return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint'
     },
 
     estimateDeviceTotalTTIRemaining (item) {
