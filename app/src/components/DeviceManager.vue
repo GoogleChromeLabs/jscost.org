@@ -243,6 +243,11 @@ export default {
     computeTTIRemainder (item) {
       return Math.floor(this.timeToInteractive - (((((Math.floor(this.bundleSize * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSize / this.baseSize)) - Math.floor(item.eval * (this.bundleSize / this.baseSize))).toFixed(0)
     },
+
+    isCustomTraceSupplied () {
+      return this.traceStats.get('JS Frame') > 0
+    },
+
     // Handle trace selection
     fileSelected (e) {
       var files = e.target.files
@@ -253,13 +258,16 @@ export default {
       }.bind(this)
       reader.readAsText(file)
     },
+
     reportTraceContent (trace, filename) {
       require(['devtools-timeline-model-browser'], (d) => {
         var model = new window.TimelineModelBrowser(trace)
         var bottomUpByName = model.bottomUpGroupBy('EventName')
         var tree = this.dumpTree(bottomUpByName, 'selfTime')
+        // this.traceTotalTime = model.topDown().totalTime
         // Bottom up tree grouped by EventName
         this.traceStats = tree['_c']
+
         // Compute loading durations
         var events = model.timelineModel().mainThreadEvents()
         var domLoading = events.filter(this._filterEventsForDomLoading)
@@ -274,6 +282,8 @@ export default {
 
         this.bundleSize = (this.customTraceLoadingTime / 80) * 300
 
+        // Finally hint to UI that a custom trace was supplied
+        this.hasCustomTrace = true
       })
     },
     dumpTree (tree, timeValue) {
