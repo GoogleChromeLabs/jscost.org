@@ -204,6 +204,12 @@ export default {
       var multiplier = (parseInt(this.traceStats.get(key), 10) / totalScriptingBaseline).toFixed(2)
       // Adjust device stats and trace stats based on this multiplier
       return Math.floor(totalScriptingForDevice * multiplier)
+    },
+
+    calculateTransferRate (fileSizeMB, transferRateMbps) {
+      // http://superuser.com/questions/360959/is-there-a-easy-way-to-calculate-time-for-data-transfer
+      return ((8000 * fileSizeMB) / transferRateMbps)
+    },
 
       // Stats from the processed trace
       // this.JSFrame = parseInt(traceStats.get('JS Frame'), 10) * multiplier
