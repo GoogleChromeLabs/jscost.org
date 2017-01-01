@@ -233,20 +233,18 @@ export default {
       return ((8000 * fileSizeMB) / transferRateMbps)
     },
 
-      // Stats from the processed trace
-      // this.JSFrame = parseInt(traceStats.get('JS Frame'), 10) * multiplier
-      // this.CompileScript = parseInt(traceStats.get('Compile Script'), 10) * multiplier
-      // this.Layout = parseInt(traceStats.get('Layout'), 10) * multiplier
-      // this.MajorGC = parseInt(traceStats.get('Major GC'), 10) * multiplier
-      // this.parseHTML = parseInt(traceStats.get('Parse HTML'), 10) * multiplier
-      // this.RecalcStyles = parseInt(traceStats.get('Parse HTML'), 10) * multiplier
-      // this.MinorGC = parseInt(traceStats.get('Minor GC'), 10) * multiplier
-      // this.EvaluateScript = parseInt(traceStats.get('Evaluate Script'), 10) * multiplier
-      // this.RunMicrotasks = parseInt(traceStats.get('Run Microtasks'), 10) * multiplier
-      // this.UpdateLayerTree = parseInt(traceStats.get('Layer Tree'), 10) * multiplier
-      // this.DOMGC = parseInt(traceStats.get('DOM GC'), 10) * multiplier
-      // this.Paint = parseInt(traceStats.get('Paint'), 10) * multiplier
-      // this.ParseStylesheet = parseInt(traceStats.get('Parse Stylesheet'), 10) * multiplier
+    getCustomTraceEstimatedTTIRemaining (item) {
+      return Math.floor(this.timeToInteractive - this.getCustomTraceSumOfTimeSpent(item)).toFixed(0)
+    },
+
+    getCustomTraceEstimatedNetworkTransferTime () {
+      return this.calculateTransferRate(this.bundleSize / 1000, this.downloadSpeed / 1000)
+    },
+
+    // WIP
+    getCustomTraceSumOfTimeSpent (item) {
+      // UPDATE JAVASCRIPT BUNDLE TEXT TO PAGE BUNDLE SIZE
+      return Math.floor(this.getCustomTraceEstimatedNetworkTransferTime() + this.getCustomTraceTotalScriptingTime(item)).toFixed(0)
     },
     // End experiment
 
