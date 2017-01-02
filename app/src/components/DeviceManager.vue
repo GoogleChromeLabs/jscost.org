@@ -1,3 +1,7 @@
+<!--
+TODO: Follow http://012.vuejs.org/guide/best-practices.html
+TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on desktop, but will likely impact it on mobile.
+-->
 <template>
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
@@ -41,6 +45,10 @@
     </div>
     <!--/controls -->
 
+    <template v-if="isCustomTraceSupplied()">
+      <p>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. Parse ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}).
+      Eval ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}).</p>
+    </template>
 
     <!--
       @name: DeviceManagerGrid
@@ -56,25 +64,25 @@
           <template v-if="traceStats.get('JS Frame') === undefined">
             <div class='details'>
               <div>
-                <span class='timeline-aggregated-legend-value'>{{computeSum(item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeSum(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
                 <span class='timeline-aggregated-legend-title'>Total Scripting</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{computeValue('parse', item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeValue('parse', item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
                 <span class='timeline-aggregated-legend-title'>Parse</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{computeValue('eval',item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeValue('eval',item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
                 <span class='timeline-aggregated-legend-title'>Evaluate</span>
               </div>
 
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
-                <span class='timeline-aggregated-legend-value'>{{computeTTIRemainder(item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
                 <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
               </div>
@@ -84,52 +92,52 @@
             </progress>
           </template>
           <!-- A user supplied trace will toggle the more detailed view -->
-          <template v-else-if="traceStats.get('JS Frame') > 0">
+          <template v-else-if="isCustomTraceSupplied()">
             <div class='details'>
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceTotalScriptingTime(item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceDeviceTotalScriptingTime(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
                 <span class='timeline-aggregated-legend-title'>Total Scripting</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'JS Frame')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #EFB320;'></span>
                 <span class='timeline-aggregated-legend-title'>JS Frame</span>
               </div>
 
               <div><!--#F3C75C-->
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Compile Script')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Compile Script'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
                 <span class='timeline-aggregated-legend-title'>Parse</span>
               </div>
 
               <div><!--#F4CE71-->
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
                 <span class='timeline-aggregated-legend-title'>Evaluate</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Major GC')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Major GC'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
                 <span class='timeline-aggregated-legend-title'>Major GC</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Minor GC')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Minor GC'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
                 <span class='timeline-aggregated-legend-title'>Minor GC</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks')}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks'))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #AAAAAA;'></span>
                 <span class='timeline-aggregated-legend-title'>Microtasks</span>
               </div>
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceParseHTMLCSSTime(item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceParseHTMLCSSTime(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #A4C4ED'></span>
                 <span class='timeline-aggregated-legend-title'>Parse HTML/CSS</span>
               </div>
@@ -149,7 +157,7 @@
               -->
 
               <div>
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimatedNetworkTransferTime()}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedNetworkTransferTime())}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA'></span>
                 <span class='timeline-aggregated-legend-title'>Load (emulated)</span>
               </div>
@@ -163,7 +171,7 @@
                     </div>
               -->
               <div v-bind:class="{ 'over-budget': isCustomTraceOverTTIBudget(item) }">
-                <span class='timeline-aggregated-legend-value'>{{getCustomTraceEstimatedTTIRemaining(item)}}ms</span>
+                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedTTIRemaining(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #CCDEF5'></span>
                 <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
               </div>
@@ -251,7 +259,7 @@ export default {
       Compute the total time spent in script across JS Frame (CPU), Compile, Eval,
       Minor and Major GC events.
     */
-    getCustomTraceTotalScriptingTime (item) {
+    getCustomTraceDeviceTotalScriptingTime (item) {
       var JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
       var CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
       var EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
@@ -260,10 +268,23 @@ export default {
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
+    getCustomTraceTotalScriptingTime () {
+      var JSFrame = this.getCustomTraceValueFor('JS Frame')
+      var CompileScript = this.getCustomTraceValueFor('Compile Script')
+      var EvaluateScript = this.getCustomTraceValueFor('Evaluate Script')
+      var MajorGC = this.getCustomTraceValueFor('Major GC')
+      var MinorGC = this.getCustomTraceValueFor('Minor GC')
+      return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
+    },
+
     getCustomTraceParseHTMLCSSTime () {
       var traceParseHTML = parseInt(this.traceStats.get('Parse HTML'), 10)
       var traceParseCSS = parseInt(this.traceStats.get('Parse Stylesheet'), 10)
       return (traceParseHTML + traceParseCSS).toFixed(0)
+    },
+
+    getCustomTraceValueFor (key) {
+      return parseInt(this.traceStats.get(key), 10)
     },
 
     // ONLY use this for timings that are JS-related (e.g Parse)
@@ -293,10 +314,8 @@ export default {
       return this.calculateTransferRate(this.bundleSizeBudget / 1000, this.downloadSpeed / 1000)
     },
 
-    // WIP
     getCustomTraceSumOfTimeSpent (item) {
-      // UPDATE JAVASCRIPT BUNDLE TEXT TO PAGE BUNDLE SIZE
-      return Math.floor(this.getCustomTraceEstimatedNetworkTransferTime() + this.getCustomTraceTotalScriptingTime(item)).toFixed(0)
+      return Math.floor(this.getCustomTraceEstimatedNetworkTransferTime() + this.getCustomTraceDeviceTotalScriptingTime(item)).toFixed(0)
     },
 
     computeSum (item) {
@@ -317,6 +336,11 @@ export default {
 
     isCustomTraceSupplied () {
       return this.traceStats.get('JS Frame') > 0
+    },
+
+    formatOutput (str) {
+      // Take an input ms-based integer and return a formatted second string
+      return (str / 1000).toFixed(2) + 's'
     },
 
     // Handle trace selection
