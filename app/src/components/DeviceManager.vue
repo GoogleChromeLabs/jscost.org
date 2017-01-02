@@ -205,16 +205,23 @@ export default {
       timeToInteractiveBudget: 5000,
       /* Scripting budget (Parse/Eval primarily) */
       scriptingBudget: 3500,
+      /* -- Network -- */
       /* Most developers are testing on desktop with a fast connection. */
       /* Default to DevTools Wifi configuration that most traces will likely be based on */
       downloadSpeed: 30000,
       devices: deviceConfig,
       network: networkConditions,
       networkSelected: '30000',
+      /* -- Custom traces -- */
+      /* Only truthy when a valid custom trace was supplied */
+      hasCustomTrace: false,
       /* If a custom trace is selected, store the trace stats */
       traceStats: new Map(),
-      /* Only truthy when a valid custom trace was supplied */
-      hasCustomTrace: false
+      /* Load stats calculated from the custom trace */
+      customTraceDOMCompleteTime: 0,
+      customTraceDOMInteractiveTime: 0,
+      customTraceLoadingTime: 0
+
     }
   },
   methods: {
