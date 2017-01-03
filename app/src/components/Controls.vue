@@ -1,0 +1,139 @@
+<template>
+  <div class='horizontal controls tabbed-pane-header'>
+
+    <!-- JavaScript bundle size -->
+    <div class='controls-entry js-bundle-size'>
+      <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
+      <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'>KB
+      <small class='blue'>{{computeGZippedSize}}KB gzipped</small>
+    </div>
+
+    <div class="toolbar-divider toolbar-item flex"></div>
+
+    <!-- Network emulation -->
+    <div class='controls-entry change-network-speed'>
+      <label for='input_downloadspeed'>Network</label>
+      <select v-model='networkSelected' @change='changeNetworkSpeed'>
+        <option v-for='option in network' v-bind:value='option.download'>
+          {{ option.title }}
+        </option>
+      </select>
+      <input v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'>Kbps
+      <small class='blue gzip-preview'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
+    </div>
+
+    <div class="toolbar-divider toolbar-item flex"></div>
+
+    <!-- Time to interactive -->
+    <div class='controls-entry time-to-interactive'>
+      <label for='input_tti'>Time-To-Interactive</label>
+      <input id='tti' v-model='timeToInteractiveBudget' v-on:input='changeTTI'>ms
+    </div>
+
+    <div class="toolbar-divider toolbar-item flex"></div>
+
+    <!-- Upload custom Timeline trace -->
+    <div class='controls-entry'>
+      <input type='file' id='selectFile' v-on:change='customTraceSelected'/>
+    </div>
+  </div>
+</template>
+<script>
+/* global FileReader */
+import networkConditions from './Network.js'
+
+export default {
+  data () {
+    return {
+      bundleSizeBudget: 1200,
+      gzippedBundleSize: 0,
+      downloadSpeed: 30000,
+      network: networkConditions,
+      networkSelected: '30000',
+      timeToInteractiveBudget: 5000
+    }
+  },
+  methods: {
+    changeTTI () {
+      this.$emit('ttichange', this.timeToInteractiveBudget)
+    },
+    changeBundleSize () {
+      this.$emit('bundlesizechange', this.bundleSizeBudget)
+    },
+    changeNetworkSpeed () {
+      this.downloadSpeed = this.networkSelected
+      this.$emit('networkchange', this.downloadSpeed)
+    },
+    changeCustomNetworkSpeed () {
+      this.$emit('networkchange', this.downloadSpeed)
+    },
+    // Handle trace selection
+    customTraceSelected (e) {
+      var files = e.target.files
+      var file = files[0]
+      var reader = new FileReader()
+      reader.onload = function (e) {
+        this.$emit('selected', e.target.result)
+      }.bind(this)
+      reader.readAsText(file)
+    }
+  },
+  computed: {
+    computeGZippedSize () {
+      return Math.floor(this.bundleSizeBudget * 0.25)
+    },
+    computeDownloadTime () {
+      return ((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)
+    }
+  }
+}
+
+</script>
+<style scoped>
+@import url('./DeviceManager-FlexHelpers.css');
+
+.controls {
+  padding: 5px 0px 0px 0px;
+}
+
+.controls-entry {
+  margin-left: 2px;
+}
+
+.controls .flex {
+  background: transparent;
+}
+
+label {
+  font-weight: 700;
+}
+
+.hasCustomTrace .js-bundle-size, .hasCustomTrace .gzip-preview {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 1250px) {
+  .tabbed-pane-header {
+    display: block;
+  }
+  .toolbar-divider {
+    display: none;
+  }
+  .controls div {
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 450px) {
+  strong span {
+    font-size: 1.3em;
+  }
+  input {
+    width: 35px;
+  }
+  .controls {
+    text-align: left;
+  }
+}
+</style>
