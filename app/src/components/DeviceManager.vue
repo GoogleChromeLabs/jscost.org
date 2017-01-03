@@ -331,6 +331,8 @@ export default {
 .device-manager {
   padding: 10px;
   display: flex;
+  max-width: 90%;
+  margin: 0 auto;
 }
 
 .device-entry {
