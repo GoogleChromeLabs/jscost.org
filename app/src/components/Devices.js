@@ -1,12 +1,17 @@
 export default [{
   'name': 'Macbook Pro - Chrome 55',
-  'parse': 247.844,
-  'eval': 13.65,
+  'parse': 233.12,
+  'eval': 11.84,
   'image': './static/macbook-pro.jpg'
 }, {
   'name': 'Macbook Pro - Safari 10',
   'parse': 69.914,
   'eval': 173.93,
+  'image': './static/macbook-pro.jpg'
+}, {
+  'name': 'Macbook Pro - Firefox 50',
+  'parse': 123.12,
+  'eval': 6.469,
   'image': './static/macbook-pro.jpg'
 }, {
   'name': 'Moto G4 - Chrome 55',
@@ -50,8 +55,8 @@ export default [{
   'image': './static/moto-e.jpg'
 }, {
   'name': 'Galaxy S7 Edge - Chrome 55',
-  'parse': 956.16,
-  'eval': 31.654,
+  'parse': 1220,
+  'eval': 41,
   'image': './static/galaxy-s7.jpg'
 }, {
   'name': 'Galaxy S6 Edge - Chrome 55',
@@ -153,10 +158,22 @@ export default [{
   'image': './static/moto-g3.jpg'
 },
 {
-  'name': 'LG G4 - Chrome 55',
+  'name': 'LG G5 - Chrome 55',
+  'parse': 1365,
+  'eval': 41,
+  'image': './static/lg-g5.jpg'
+},
+{
+  'name': 'LG G4 - Chrome',
   'parse': 2245,
   'eval': 211,
   'image': './static/lh-h815-g4.jpg'
+},
+{
+  'name': 'Samsung G4 - Chrome 55',
+  'parse': 3939,
+  'eval': 127,
+  'image': './static/GT-I9505.jpg'
 },
 {
   'name': 'Lenovo A6000 - Chrome',
@@ -185,6 +202,16 @@ export default [{
   'parse': 2167,
   'eval': 54,
   'image': './static/xiaomi-mi-41.jpg'
+}, {
+  'name': 'Xiaomi Mi5 Smartphone - Chrome 55',
+  'parse': 1650,
+  'eval': 51,
+  'image': './static/xiaomi-mi5.jpg'
+}, {
+  'name': 'Xiaomi Redmi Note 3',
+  'parse': 1198,
+  'eval': 35,
+  'image': './static/redmi.jpg'
 }, {
   'name': 'Asus T00J Zenfone 5 - Chrome',
   'parse': 6574,
@@ -235,4 +262,9 @@ export default [{
   'parse': 434.849,
   'eval': 24.425,
   'image': './static/nexus5x.jpg'
+}, {
+  'name': 'HTC One (M8) - Chrome',
+  'parse': 3866,
+  'eval': 135,
+  'image': './static/htc-one.jpg'
 }]
