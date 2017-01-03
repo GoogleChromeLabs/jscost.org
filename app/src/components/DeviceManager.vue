@@ -1,59 +1,23 @@
 <!--
-TODO: Follow http://012.vuejs.org/guide/best-practices.html
-TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on desktop, but will likely impact it on mobile.
+TODO: What is the cost of inline x(y(item)) vs. foo(item) where the method does x(y(item)) for you.
+TODO: Start breaking things up into components
 -->
 <template>
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
-    <!--
-      @name: DeviceManagerControls
-      @description: Configure the bundle size, network and TTI settings
-    -->
-    <div class='horizontal controls tabbed-pane-header'>
-
-      <div class='controls-entry js-bundle-size'>
-        <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
-        <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget'>KB
-        <small class='blue'>{{computeGZippedSize}}KB gzipped</small>
-      </div>
-
-      <div class="toolbar-divider toolbar-item flex"></div>
-
-      <div class='controls-entry change-network-speed'>
-        <label for='input_downloadspeed'>Network</label>
-        <select v-model='networkSelected' @change='changeNetworkSpeed'>
-          <option v-for='option in network' v-bind:value='option.download'>
-            {{ option.title }}
-          </option>
-        </select>
-        <input v-model='downloadSpeed' id='input_downloadspeed'>Kbps
-        <small class='blue gzip-preview'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
-      </div>
-
-      <div class="toolbar-divider toolbar-item flex"></div>
-
-      <div class='controls-entry time-to-interactive'>
-        <label for='input_tti'>Time-To-Interactive</label>
-        <input id='tti' v-model='timeToInteractiveBudget'>ms
-      </div>
-
-      <div class="toolbar-divider toolbar-item flex"></div>
-
-      <div class='controls-entry'>
-        <input type='file' id='selectFile' v-on:change='fileSelected'/>
-      </div>
-    </div>
-    <!--/controls -->
+    <my-controls
+      v-on:selected='reportTraceContent'
+      v-on:bundlesizechange='bundleSizeChanged'
+      v-on:networkchange='networkSpeedChanged'
+      v-on:ttichange= 'ttiChanged'
+    ></my-controls>
 
     <template v-if="isCustomTraceSupplied()">
       <p>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. Parse ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}).
       Eval ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}).</p>
     </template>
 
-    <!--
-      @name: DeviceManagerGrid
-      @description: Devices with stat estimations based on controls/trace
-    -->
+
     <div class='device-manager horizontal layout wrap'>
       <div v-for='item in devices' class='device-entry-container'>
         <div class='device-entry'>
@@ -63,23 +27,21 @@ TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on des
           <!-- Template for synthetic benchmark -->
           <template v-if="traceStats.get('JS Frame') === undefined">
             <div class='details'>
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeSum(item))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
-                <span class='timeline-aggregated-legend-title'>Total Scripting</span>
-              </div>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeValue('parse', item))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
-                <span class='timeline-aggregated-legend-title'>Parse</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(computeSum(item))"
+                color="rgb(243, 210, 124)"
+                title="Total Scripting"></timeline-legend>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(computeValue('eval',item))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
-                <span class='timeline-aggregated-legend-title'>Evaluate</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(computeValue('parse', item))"
+                color="rgb(144, 194, 133)"
+                title="Parse"></timeline-legend>
+
+              <timeline-legend
+                :value="formatOutput(computeValue('eval',item))"
+                color="rgb(144, 183, 234)"
+                title="Evaluate"></timeline-legend>
 
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
@@ -94,53 +56,52 @@ TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on des
           <!-- A user supplied trace will toggle the more detailed view -->
           <template v-else-if="isCustomTraceSupplied()">
             <div class='details'>
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceDeviceTotalScriptingTime(item))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(243, 210, 124);'></span>
-                <span class='timeline-aggregated-legend-title'>Total Scripting</span>
-              </div>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #EFB320;'></span>
-                <span class='timeline-aggregated-legend-title'>JS Frame</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceDeviceTotalScriptingTime(item))"
+                color="rgb(243, 210, 124)"
+                title="Total Scripting"></timeline-legend>
 
-              <div><!--#F3C75C-->
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Compile Script'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 194, 133);'></span>
-                <span class='timeline-aggregated-legend-title'>Parse</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))"
+                color="#EFB320"
+                title="JS Frame"></timeline-legend>
 
-              <div><!--#F4CE71-->
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(144, 183, 234);'></span>
-                <span class='timeline-aggregated-legend-title'>Evaluate</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Compile Script'))"
+                color="rgb(144, 194, 133)"
+                title="Parse"></timeline-legend>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Major GC'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
-                <span class='timeline-aggregated-legend-title'>Major GC</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script'))"
+                color="rgb(144, 183, 234)"
+                title="Evaluate"></timeline-legend>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Minor GC'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #FAEAC2'></span>
-                <span class='timeline-aggregated-legend-title'>Minor GC</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Major GC'))"
+                color="#FAEAC2"
+                title="Major CC"></timeline-legend>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks'))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #AAAAAA;'></span>
-                <span class='timeline-aggregated-legend-title'>Microtasks</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Minor GC'))"
+                color="#FAEAC2"
+                title="Minor CC"></timeline-legend>
 
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceParseHTMLCSSTime(item))}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #A4C4ED'></span>
-                <span class='timeline-aggregated-legend-title'>Parse HTML/CSS</span>
-              </div>
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks'))"
+                color="#AAAAAA"
+                title="Microtasks"></timeline-legend>
+
+              <timeline-legend
+                :value="formatOutput(getCustomTraceParseHTMLCSSTime(item))"
+                color="#A4C4ED"
+                title="Parse HTML/CSS"></timeline-legend>
+
+              <timeline-legend
+                :value="formatOutput(getCustomTraceEstimatedNetworkTransferTime())"
+                color="#90B7EA"
+                title="Load (emulated)"></timeline-legend>
+
               <!--
               <div>
                 <span class='timeline-aggregated-legend-value'>{{customTraceDOMCompleteTime}}ms</span>
@@ -154,21 +115,6 @@ TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on des
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA'></span>
                 <span class='timeline-aggregated-legend-title'>Load (original trace)</span>
               </div>
-              -->
-
-              <div>
-                <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedNetworkTransferTime())}}</span>
-                <span class='timeline-aggregated-legend-swatch' style='background-color: #90B7EA'></span>
-                <span class='timeline-aggregated-legend-title'>Load (emulated)</span>
-              </div>
-
-              <!--
-                    This will only be present in the trace if the Network option is checked in DevTools
-                    <div>
-                      <span class='timeline-aggregated-legend-value'>{{traceStats.get('Finish Loading')}}ms</span>
-                      <span class='timeline-aggregated-legend-swatch' style='background-color: #AAAAAA;'></span>
-                      <span class='timeline-aggregated-legend-title'>Finish Loading</span>
-                    </div>
               -->
               <div v-bind:class="{ 'over-budget': isCustomTraceOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedTTIRemaining(item))}}</span>
@@ -188,12 +134,18 @@ TODO: Text at top? Your trace spends over Xms in JS. This may impact perf on des
 </template>
 
 <script>
-/* global FileReader */
 import deviceConfig from './Devices.js'
 import networkConditions from './Network.js'
+import controls from './Controls.vue'
+import timelineLegend from './TimelineLegend.vue'
+import * as TimelineFilters from './TimelineFilters.js'
 
 export default {
   name: 'jscost',
+  components: {
+    'my-controls': controls,
+    'timeline-legend': timelineLegend
+  },
   data () {
     return {
       /* -- Budgets -- */
@@ -225,10 +177,6 @@ export default {
     }
   },
   methods: {
-    changeNetworkSpeed () {
-      this.downloadSpeed = this.networkSelected
-    },
-
     isCustomTraceOverTTIBudget (item) {
       return (this.getCustomTraceEstimatedTTIRemaining(item) < -1)
     },
@@ -237,30 +185,19 @@ export default {
       return (this.computeTTIRemainder(item) < -1)
     },
 
-    /* Trace helpers */
-    _filterEventsForNavStart (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'navigationStart'
+    // <my-controls>
+    networkSpeedChanged (speed) {
+      this.downloadSpeed = speed
     },
 
-    _filterEventsForLoadEventEnd (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd'
+    ttiChanged (tti) {
+      this.timeToInteractiveBudget = tti
     },
 
-    _filterEventsForDomLoading (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'domLoading'
+    bundleSizeChanged (bundleSize) {
+      this.bundleSizeBudget = bundleSize
     },
-
-    _filterEventsForDomComplete (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'domComplete'
-    },
-
-    _filterEventsForDomInteractive (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'domInteractive'
-    },
-
-    _filterEventsForFirstTextPaint (e) {
-      return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint'
-    },
+    // </my-controls>
 
     /*
       Compute the total time spent in script across JS Frame (CPU), Compile, Eval,
@@ -350,17 +287,6 @@ export default {
       return (str / 1000).toFixed(2) + 's'
     },
 
-    // Handle trace selection
-    fileSelected (e) {
-      var files = e.target.files
-      var file = files[0]
-      var reader = new FileReader()
-      reader.onload = function (e) {
-        this.reportTraceContent(e.target.result, 'trace')
-      }.bind(this)
-      reader.readAsText(file)
-    },
-
     reportTraceContent (trace, filename) {
       require(['devtools-timeline-model-browser'], (d) => {
         var model = new window.TimelineModelBrowser(trace)
@@ -372,11 +298,11 @@ export default {
 
         // Compute loading durations
         var events = model.timelineModel().mainThreadEvents()
-        var domLoading = events.filter(this._filterEventsForDomLoading)
-        var domComplete = events.filter(this._filterEventsForDomComplete)
-        var domInteractive = events.filter(this._filterEventsForDomInteractive)
-        var navStart = events.filter(this._filterEventsForNavStart)
-        var loadEventEnd = events.filter(this._filterEventsForLoadEventEnd)
+        var domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
+        var domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
+        var domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
+        var navStart = events.filter(TimelineFilters._filterEventsForNavStart)
+        var loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
 
         this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
@@ -392,15 +318,6 @@ export default {
       var result = new Map()
       tree.children.forEach((value, key) => result.set(key, value[timeValue].toFixed(1)))
       return result
-    }
-  },
-
-  computed: {
-    computeGZippedSize () {
-      return Math.floor(this.bundleSizeBudget * 0.25)
-    },
-    computeDownloadTime () {
-      return ((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)
     }
   }
 }
@@ -436,18 +353,6 @@ export default {
   margin-top: 10px;
 }
 
-.controls {
-  padding: 5px 0px 0px 0px;
-}
-
-.controls-entry {
-  margin-left: 2px;
-}
-
-.controls .flex {
-  background: transparent;
-}
-
 label {
   font-weight: 700;
 }
@@ -462,29 +367,12 @@ label {
 
 /* Mobile styles */
 @media (max-width: 1250px) {
-  .tabbed-pane-header {
-    display: block;
-  }
-  .toolbar-divider {
-    display: none;
-  }
-  .controls div {
-    margin-bottom: 6px;
-  }
+  /* */
 }
 
 @media (max-width: 450px) {
-  strong span {
-    font-size: 1.3em;
-  }
   .device-entry-container {
     margin: 0 auto;
-  }
-  input {
-    width: 35px;
-  }
-  .controls {
-    text-align: left;
   }
 }
 </style>
