@@ -188,6 +188,12 @@ export default [{
   'image': './static/huawei-p9.jpg'
 },
 {
+  'name': 'Huawei Ascend G700 - Chrome',
+  'parse': 3022,
+  'eval': 424,
+  'image': './static/ascend-g700.jpg'
+},
+{
   'name': 'Samsung Galaxy A3 - Chrome',
   'parse': 2326,
   'eval': 291,
