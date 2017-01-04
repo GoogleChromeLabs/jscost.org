@@ -4,7 +4,6 @@ TODO: Start breaking things up into components
 -->
 <template>
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
-
     <my-controls
       v-on:selected='reportTraceContent'
       v-on:bundlesizechange='bundleSizeChanged'
@@ -65,7 +64,7 @@ TODO: Start breaking things up into components
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))"
                 color="#EFB320"
-                title="JS Frame"></timeline-legend>
+                title="Function Call"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Compile Script'))"
