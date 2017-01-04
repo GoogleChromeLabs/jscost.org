@@ -14,6 +14,11 @@ export default [{
   'eval': 6.469,
   'image': './static/macbook-pro.jpg'
 }, {
+  'name': 'Microsoft Surface Pro 4 - Edge',
+  'parse': 358.08,
+  'eval': 28.705,
+  'image': './static/surface-pro-4.jpg'
+}, {
   'name': 'Moto G4 - Chrome 55',
   'parse': 1429,
   'eval': 73,
