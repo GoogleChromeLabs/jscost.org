@@ -1,11 +1,10 @@
 <template>
   <div class='horizontal controls tabbed-pane-header'>
-
     <!-- JavaScript bundle size -->
     <div class='controls-entry js-bundle-size'>
       <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
       <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'>KB
-      <small class='blue'>{{computeGZippedSize}}KB gzipped</small>
+      <small class='gz'>{{computeGZippedSize}}KB gzipped</small>
     </div>
 
     <div class="toolbar-divider toolbar-item flex"></div>
@@ -19,7 +18,7 @@
         </option>
       </select>
       <input v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'>Kbps
-      <small class='blue gzip-preview'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
+      <small class='gz gzip-preview'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
     </div>
 
     <div class="toolbar-divider toolbar-item flex"></div>
@@ -94,6 +93,23 @@ export default {
 
 .controls {
   padding: 5px 0px 0px 0px;
+}
+
+.controls .gz {
+  color: blue;
+}
+
+.controls.dark {
+  background-color: #333333;
+  color: #f3f3f3;
+}
+
+.controls.dark .gz {
+  color: #F1DD3F
+}
+
+input {
+  /*width: 50px;*/
 }
 
 .controls-entry {
