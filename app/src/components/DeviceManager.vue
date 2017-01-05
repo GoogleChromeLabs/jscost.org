@@ -251,7 +251,7 @@ export default {
       // Next, what's the total time in script for the current device?
       var totalScriptingForDevice = item.parse + item.eval
       // Calculate multiplier relative to the mbp scores as they're the same app
-      var multiplier = (this.getCustomTraceValueForkey(key) / totalScriptingBaseline).toFixed(2)
+      var multiplier = (this.getCustomTraceValueFor(key) / totalScriptingBaseline).toFixed(2)
       // Adjust device stats and trace stats based on this multiplier
       return Math.floor(totalScriptingForDevice * multiplier)
     },
