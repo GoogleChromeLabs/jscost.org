@@ -4,12 +4,46 @@
     JavaScript Parse/Eval across different devices (Devices.js). The test used to gather the
     data for this baseline is at https://jscost.org/device-test.html. Each time a device hits
     this URL, we record the cost of Parse and Eval using Google Analytics, which allows us to drill
-    down to the Mobile Device Model.
+    down to the Mobile Device Model. 
+    
+    By default, we show the parse/eval costs for each of these devices on initial load. A user can 
+    modify the bundle size, network speed or time-to-interactive budget to see how these may impact
+    the benchmark on these different devices. 
+    
+    You are also able to select a custom (desktop) trace which attempts to estimate your performance 
+    on these real-world device numbers relative to the synthetic benchmark. This is strictly an 
+    estimation tool and does not claim to be a replacement for real-world device testing. Instead use 
+    it as a hundred-foot view of what device perf for scripting could be.
 
-    We make a (perhaps loose) correlation by default that the size of a JavaScript bundle can 
-    have a linear impact on the Parse/Eval time for a page and thus impact overall time spent in script. 
-    A user can play with their bundle size to see how this can push out their time to being interactive on
-    different devices. Bundle size 
+    Assumptions made:
+
+    JS bundle-size can impact scripting time 
+    ----------------------------------------------------------------
+
+    We make a correlation by default that the size of a JavaScript bundle can 
+    have a linear impact on the Parse/Eval time for a page and thus impact overall time spent 
+    in script. A user can play with their bundle size to see how this can push out their time 
+    to being interactive on different devices. Once again, please measure your real world code 
+    if assumptions don't align.
+
+    It is possible to (loosely) estimate the gzipped-size of a JS bundle 
+    --------------------------------------------------------------------
+
+    Modern JS code is likely to be served using gzip compression. As this benchmark is synthetic, it's
+    we can at best try to 'guess' what average gzip compression might save you. We use Stoyan Stefanov's
+    estimation of gzip saving you 70% in our computations, both for the synth benchmark and when trying 
+    to use your own custom traces. As DevTools Timeline traces do not (at the time of writing) expose the
+    size of scripts, estimations are all we can really offer here.
+
+    It is possible to (loosely) estimate the transfer time of a JS bundle 
+    ----------------------------------------------------------------------
+
+    We estimate transfer time by dividing the bundle size (in GB) by the est. IP/TCP overhead 
+    and then divide it by the speed of our connection in MB per/second based on the numbers from
+    Network.js (dervived from the Chrome DevTools network emulation feature). Calculations do not
+    presently account for other factors such as network spotiness or latency. If you have a better
+    way to estimate transfer time, please do let us know!.
+
     -->
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
@@ -309,6 +343,7 @@ export default {
     computeGZippedSize (uncompressedRequestSize) {
       // This is at best a guess and in real-world situations you would
       // run gzip tools against your bundle for the correct numbers here.
+      // We estimate a 70% reduction in filesize if you're gzipping.
       // http://www.phpied.com/reducing-tpayload/
       return Math.floor(uncompressedRequestSize * 0.3)
     },
