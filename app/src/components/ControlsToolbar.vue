@@ -3,7 +3,8 @@
     ControlsToolbar provides a toolbar for configuring the DeviceManager.
     It exposes a number of events that can be used to trigger actions in a
     parent, such as when the Network emulation has been changed or the JavaScript
-    bundle size has been modified. The events that can be listed for are:
+    bundle size has been modified. The events this component emits that can be
+    listened for are:
 
     `traceselected`: A custom trace file has been selected from disk
     `bundlesizechange`: The bundle size has been modified via user input
