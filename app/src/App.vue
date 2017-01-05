@@ -2,7 +2,7 @@
   <div id="app">
     <div class="header-cont">
         <div class="header">
-          <img id="logo" src="/static/logo.png"/>
+          <img id="logo" src="/static/logo.svg"/>
         </div>
     </div>    
     <deviceManager></deviceManager>
@@ -54,7 +54,7 @@ body {
 #logo {
     font-weight: bold;
     font-size: 18px;
-    padding-top: 14px;
+    padding-top: 10px;
     width: 90px;
 }
 </style>
