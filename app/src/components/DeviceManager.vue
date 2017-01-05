@@ -4,16 +4,25 @@
     JavaScript Parse/Eval across different devices (Devices.js). The test used to gather the
     data for this baseline is at https://jscost.org/device-test.html. Each time a device hits
     this URL, we record the cost of Parse and Eval using Google Analytics, which allows us to drill
-    down to the Mobile Device Model. 
+    down to the Mobile Device Model. All data is recorded from real-devices using the default browser
+    available (e.g a Pixel will use Chrome, iPhones use Safari) unless otherwise noted. Data is 
+    also based on the median of samples available for each device.
     
-    By default, we show the parse/eval costs for each of these devices on initial load. A user can 
+    By default, we present the parse/eval costs for each of these devices when you visit JSCost. A user can 
     modify the bundle size, network speed or time-to-interactive budget to see how these may impact
-    the benchmark on these different devices. 
+    the benchmark on these different devices. This is done using a series of multipiers. If the Parse cost
+    on a Nexus 5X is N for MKB of script, for a target bundle size of PKB, parse cost is N * (P/M). 
     
     You are also able to select a custom (desktop) trace which attempts to estimate your performance 
-    on these real-world device numbers relative to the synthetic benchmark. This is strictly an 
-    estimation tool and does not claim to be a replacement for real-world device testing. Instead use 
-    it as a hundred-foot view of what device perf for scripting could be.
+    on these real-world device numbers relative to the synthetic benchmark. A custom trace *must* be
+    recorded on a desktop device using a strong/WiFi connection. A custom trace provides us with full
+    details on Parse/Eval/FunctionCall/GC time. For each of these values, we first look at what their values
+    would be relative to the synthetic benchmarks Parse/Eval scores for like-for-like hardware (a MBP).
+    We then use a similar model as described earlier to estimate performance on each device. Accuracy is
+    impacted by lack of DevTools traces providing JS bundle sizes (we have asked for this).
+    
+    JSCost is strictly an estimation tool and does not claim to be a replacement for real-world device 
+    testing. Instead use it as a hundred-foot view of what device perf for scripting could be.
 
     Assumptions made:
 
@@ -23,8 +32,9 @@
     We make a correlation by default that the size of a JavaScript bundle can 
     have a linear impact on the Parse/Eval time for a page and thus impact overall time spent 
     in script. A user can play with their bundle size to see how this can push out their time 
-    to being interactive on different devices. Once again, please measure your real world code 
-    if assumptions don't align.
+    to being interactive on different devices. It's acknowledged that real-world code can vary
+    wildly in this regard (e.g 300KB of script in app A may exhibit higher costs than B) so we
+    stress that as much as possible, insights are backed by real-world testing.
 
     It is possible to (loosely) estimate the gzipped-size of a JS bundle 
     --------------------------------------------------------------------
