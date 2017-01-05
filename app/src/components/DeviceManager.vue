@@ -181,7 +181,7 @@ export default {
       return (this.computeTTIRemainder(item) < -1)
     },
 
-    // <my-controls>
+    // <toolbar-controls>
     networkSpeedChanged (speed) {
       this.downloadSpeed = speed
     },
@@ -193,11 +193,18 @@ export default {
     bundleSizeChanged (bundleSize) {
       this.bundleSizeBudget = bundleSize
     },
-    // </my-controls>
+    // </toolbar-controls>
 
     /*
-      Compute the total time spent in script across JS Frame (CPU), Compile, Eval,
-      Minor and Major GC events.
+      Extract a specific key value from a stored trace
+    */
+    getCustomTraceValueFor (key) {
+      return parseInt(this.traceStats.get(key), 10)
+    },
+    /*
+      Compute the total (estimated) time spent in script across JS Frame (CPU), Compile, Eval,
+      Minor and Major GC events for a given item. An item is an entry based on a device entry
+      from Devices.js.
     */
     getCustomTraceDeviceTotalScriptingTime (item) {
       var JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
@@ -208,6 +215,14 @@ export default {
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
+    /*
+      Compute the total time spent in script across JS Frame (CPU), Compile, Eval,
+      Minor and Major GC events for a preloaded custom trace. This data is read directly
+      from the trace rather than any estimation modelling being performed on the data.
+
+      Trace data is made available to DeviceManager when saveTraceStats() is called via
+      this.traceStats.
+    */
     getCustomTraceTotalScriptingTime () {
       var JSFrame = this.getCustomTraceValueFor('JS Frame')
       var CompileScript = this.getCustomTraceValueFor('Compile Script')
@@ -217,14 +232,14 @@ export default {
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
+    /*
+      Compute the total time spent parsing HTML and CSS Stylesheets directly from a trace.
+      Returns the sum of `Parse HTML` and `Parse Stylesheet` events.
+    */
     getCustomTraceParseHTMLCSSTime () {
-      var traceParseHTML = parseInt(this.traceStats.get('Parse HTML'), 10)
-      var traceParseCSS = parseInt(this.traceStats.get('Parse Stylesheet'), 10)
+      var traceParseHTML = this.getCustomTraceValueFor('Parse HTML')
+      var traceParseCSS = this.getCustomTraceValueFor('Parse Stylesheet')
       return (traceParseHTML + traceParseCSS).toFixed(0)
-    },
-
-    getCustomTraceValueFor (key) {
-      return parseInt(this.traceStats.get(key), 10)
     },
 
     // ONLY use this for timings that are JS-related (e.g Parse)
@@ -236,7 +251,7 @@ export default {
       // Next, what's the total time in script for the current device?
       var totalScriptingForDevice = item.parse + item.eval
       // Calculate multiplier relative to the mbp scores as they're the same app
-      var multiplier = (parseInt(this.traceStats.get(key), 10) / totalScriptingBaseline).toFixed(2)
+      var multiplier = (this.getCustomTraceValueForkey(key) / totalScriptingBaseline).toFixed(2)
       // Adjust device stats and trace stats based on this multiplier
       return Math.floor(totalScriptingForDevice * multiplier)
     },
@@ -283,14 +298,18 @@ export default {
       return (str / 1000).toFixed(2) + 's'
     },
 
+    /* Store a given trace or subset of a modelled trace in-memory for local use */
+    storeTraceStats (trace) {
+      this.traceStats = trace
+    },
+
     reportTraceContent (trace, filename) {
       require(['devtools-timeline-model-browser'], (d) => {
         var model = new window.TimelineModelBrowser(trace)
         var bottomUpByName = model.bottomUpGroupBy('EventName')
         var tree = this.dumpTree(bottomUpByName, 'selfTime')
-        // this.traceTotalTime = model.topDown().totalTime
         // Bottom up tree grouped by EventName
-        this.traceStats = tree['_c']
+        this.storeTraceStats(tree['_c'])
 
         // Compute loading durations
         var events = model.timelineModel().mainThreadEvents()
