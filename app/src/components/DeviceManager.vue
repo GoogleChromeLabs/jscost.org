@@ -1,6 +1,6 @@
 <template>
   <!--
-    DeviceManager provides a synthetic benchmark using a baseline cost for "average"
+    DeviceManager provides a synthetic benchmark using a baseline cost for 1048KB of "average"
     JavaScript Parse/Eval across different devices (Devices.js). The test used to gather the
     data for this baseline is at https://jscost.org/device-test.html. Each time a device hits
     this URL, we record the cost of Parse and Eval using Google Analytics, which allows us to drill
@@ -19,7 +19,7 @@
     details on Parse/Eval/FunctionCall/GC time. For each of these values, we first look at what their values
     would be relative to the synthetic benchmarks Parse/Eval scores for like-for-like hardware (a MBP).
     We then use a similar model as described earlier to estimate performance on each device. Accuracy is
-    impacted by lack of DevTools traces providing JS bundle sizes (we have asked for this).
+    impacted by lack of DevTools traces providing JS bundle sizes (we have asked for this). 
     
     JSCost is strictly an estimation tool and does not claim to be a replacement for real-world device 
     testing. Instead use it as a hundred-foot view of what device perf for scripting could be.
@@ -53,6 +53,10 @@
     Network.js (dervived from the Chrome DevTools network emulation feature). Calculations do not
     presently account for other factors such as network spotiness or latency. If you have a better
     way to estimate transfer time, please do let us know!.
+
+
+    Could look at different types of sites/apps using same approach.
+
 
     -->
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
@@ -132,12 +136,12 @@
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Major GC'))"
                 color="#FAEAC2"
-                title="Major CC"></timeline-legend>
+                title="Major GC"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Minor GC'))"
                 color="#FAEAC2"
-                title="Minor CC"></timeline-legend>
+                title="Minor GC"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks'))"
