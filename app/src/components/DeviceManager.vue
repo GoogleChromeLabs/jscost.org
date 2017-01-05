@@ -1,4 +1,16 @@
 <template>
+  <!--
+    DeviceManager provides a synthetic benchmark using a baseline cost for "average"
+    JavaScript Parse/Eval across different devices (Devices.js). The test used to gather the
+    data for this baseline is at https://jscost.org/device-test.html. Each time a device hits
+    this URL, we record the cost of Parse and Eval using Google Analytics, which allows us to drill
+    down to the Mobile Device Model.
+
+    We make a (perhaps loose) correlation by default that the size of a JavaScript bundle can 
+    have a linear impact on the Parse/Eval time for a page and thus impact overall time spent in script. 
+    A user can play with their bundle size to see how this can push out their time to being interactive on
+    different devices. Bundle size 
+    -->
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
     <toolbar-controls
@@ -25,17 +37,17 @@
             <div class='details'>
 
               <timeline-legend
-                :value="formatOutput(computeSum(item))"
+                :value="formatOutput(computeSumRelativeToBudget(item))"
                 color="rgb(243, 210, 124)"
                 title="Total Scripting"></timeline-legend>
 
               <timeline-legend
-                :value="formatOutput(computeValue('parse', item))"
+                :value="formatOutput(computeValueRelativeToBudget('parse', item))"
                 color="rgb(144, 194, 133)"
                 title="Parse"></timeline-legend>
 
               <timeline-legend
-                :value="formatOutput(computeValue('eval',item))"
+                :value="formatOutput(computeValueRelativeToBudget('eval',item))"
                 color="rgb(144, 183, 234)"
                 title="Evaluate"></timeline-legend>
 
@@ -94,7 +106,7 @@
                 title="Parse HTML/CSS"></timeline-legend>
 
               <timeline-legend
-                :value="formatOutput(getCustomTraceEstimatedNetworkTransferTime())"
+                :value="formatOutput(getEstimatedNetworkTransferTime())"
                 color="#90B7EA"
                 title="Load (emulated)"></timeline-legend>
 
@@ -207,11 +219,11 @@ export default {
       from Devices.js.
     */
     getCustomTraceDeviceTotalScriptingTime (item) {
-      var JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
-      var CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
-      var EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
-      var MajorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Major GC')
-      var MinorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Minor GC')
+      let JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
+      let CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
+      let EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
+      let MajorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Major GC')
+      let MinorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Minor GC')
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
@@ -224,11 +236,11 @@ export default {
       this.traceStats.
     */
     getCustomTraceTotalScriptingTime () {
-      var JSFrame = this.getCustomTraceValueFor('JS Frame')
-      var CompileScript = this.getCustomTraceValueFor('Compile Script')
-      var EvaluateScript = this.getCustomTraceValueFor('Evaluate Script')
-      var MajorGC = this.getCustomTraceValueFor('Major GC')
-      var MinorGC = this.getCustomTraceValueFor('Minor GC')
+      const JSFrame = this.getCustomTraceValueFor('JS Frame')
+      const CompileScript = this.getCustomTraceValueFor('Compile Script')
+      const EvaluateScript = this.getCustomTraceValueFor('Evaluate Script')
+      const MajorGC = this.getCustomTraceValueFor('Major GC')
+      const MinorGC = this.getCustomTraceValueFor('Minor GC')
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
@@ -237,8 +249,8 @@ export default {
       Returns the sum of `Parse HTML` and `Parse Stylesheet` events.
     */
     getCustomTraceParseHTMLCSSTime () {
-      var traceParseHTML = this.getCustomTraceValueFor('Parse HTML')
-      var traceParseCSS = this.getCustomTraceValueFor('Parse Stylesheet')
+      const traceParseHTML = this.getCustomTraceValueFor('Parse HTML')
+      const traceParseCSS = this.getCustomTraceValueFor('Parse Stylesheet')
       return (traceParseHTML + traceParseCSS).toFixed(0)
     },
 
@@ -247,46 +259,58 @@ export default {
       // Assume the trace was taken on a high-end desktop, like an MBP
       // Let's first calculate how much time the default benchmark spends
       // in script for that device. We'll use this as a relative weight.
-      var totalScriptingBaseline = deviceConfig[0].parse + deviceConfig[0].eval
+      const totalScriptingBaseline = deviceConfig[0].parse + deviceConfig[0].eval
       // Next, what's the total time in script for the current device?
-      var totalScriptingForDevice = item.parse + item.eval
+      const totalScriptingForDevice = item.parse + item.eval
       // Calculate multiplier relative to the mbp scores as they're the same app
-      var multiplier = (this.getCustomTraceValueFor(key) / totalScriptingBaseline).toFixed(2)
+      const multiplier = (this.getCustomTraceValueFor(key) / totalScriptingBaseline).toFixed(2)
       // Adjust device stats and trace stats based on this multiplier
       return Math.floor(totalScriptingForDevice * multiplier)
-    },
-
-    calculateTransferRate (fileSizeMB, transferRateMbps) {
-      // http://superuser.com/questions/360959/is-there-a-easy-way-to-calculate-time-for-data-transfer
-      return ((8000 * fileSizeMB) / transferRateMbps)
     },
 
     getCustomTraceEstimatedTTIRemaining (item) {
       return Math.floor(this.timeToInteractiveBudget - this.getCustomTraceSumOfTimeSpent(item)).toFixed(0)
     },
 
-    getCustomTraceEstimatedNetworkTransferTime () {
-      return this.calculateTransferRate(this.bundleSizeBudget / 1000, this.downloadSpeed / 1000)
+    getEstimatedNetworkTransferTime () {
+      return this.calculateTransferRate(this.computeGZippedSize(this.bundleSizeBudget), this.downloadSpeed / 1000)
     },
 
     getCustomTraceSumOfTimeSpent (item) {
-      return Math.floor(this.getCustomTraceEstimatedNetworkTransferTime() + this.getCustomTraceDeviceTotalScriptingTime(item)).toFixed(0)
+      return Math.floor(this.getEstimatedNetworkTransferTime() + this.getCustomTraceDeviceTotalScriptingTime(item)).toFixed(0)
     },
 
-    computeSum (item) {
+    computeSumRelativeToBudget (item) {
       return Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) + Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize))
     },
 
-    computeValue (field, item) {
+    computeValueRelativeToBudget (field, item) {
       return Math.floor(item[field] * (this.bundleSizeBudget / this.baseSize))
     },
 
     computeTimeSum (item) {
-      return Math.floor(((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000) + Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) + Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize)))
+      return Math.floor(this.getEstimatedNetworkTransferTime() + Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) + Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize)))
     },
 
     computeTTIRemainder (item) {
       return Math.floor(this.timeToInteractiveBudget - (((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)) - Math.floor(item.parse * (this.bundleSizeBudget / this.baseSize)) - Math.floor(item.eval * (this.bundleSizeBudget / this.baseSize))).toFixed(0)
+    },
+
+    /*
+      Estimate how long it would take to transfer Nmb using a connection
+      with a known transfer rate.
+    */
+    calculateTransferRate (fileSizeMB, transferRateMbps) {
+      // http://superuser.com/a/361237
+      // [1024 Mio/Gio] * [8 Mb/Mio] / 94.92848% ≈ 8630
+      return ((8630 * (fileSizeMB / 1000)) / transferRateMbps)
+    },
+
+    computeGZippedSize (uncompressedRequestSize) {
+      // This is at best a guess and in real-world situations you would
+      // run gzip tools against your bundle for the correct numbers here.
+      // http://www.phpied.com/reducing-tpayload/
+      return Math.floor(uncompressedRequestSize * 0.3)
     },
 
     isCustomTraceSupplied () {
@@ -305,19 +329,19 @@ export default {
 
     reportTraceContent (trace, filename) {
       require(['devtools-timeline-model-browser'], (d) => {
-        var model = new window.TimelineModelBrowser(trace)
-        var bottomUpByName = model.bottomUpGroupBy('EventName')
-        var tree = this.dumpTree(bottomUpByName, 'selfTime')
+        const model = new window.TimelineModelBrowser(trace)
+        const bottomUpByName = model.bottomUpGroupBy('EventName')
+        const tree = this.dumpTree(bottomUpByName, 'selfTime')
         // Bottom up tree grouped by EventName
         this.storeTraceStats(tree['_c'])
 
         // Compute loading durations
-        var events = model.timelineModel().mainThreadEvents()
-        var domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
-        var domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
-        var domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
-        var navStart = events.filter(TimelineFilters._filterEventsForNavStart)
-        var loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
+        const events = model.timelineModel().mainThreadEvents()
+        let domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
+        let domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
+        let domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
+        let navStart = events.filter(TimelineFilters._filterEventsForNavStart)
+        let loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
 
         this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
@@ -330,7 +354,7 @@ export default {
       })
     },
     dumpTree (tree, timeValue) {
-      var result = new Map()
+      let result = new Map()
       tree.children.forEach((value, key) => result.set(key, value[timeValue].toFixed(1)))
       return result
     }
