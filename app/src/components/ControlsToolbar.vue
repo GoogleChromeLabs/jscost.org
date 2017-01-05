@@ -1,4 +1,24 @@
 <template>
+  <!--
+    ControlsToolbar provides a toolbar for configuring the DeviceManager.
+    It exposes a number of events that can be used to trigger actions in a
+    parent, such as when the Network emulation has been changed or the JavaScript
+    bundle size has been modified. The events that can be listed for are:
+
+    `traceselected`: A custom trace file has been selected from disk
+    `bundlesizechange`: The bundle size has been modified via user input
+    `networkchange`: Network emulation profile has been modified (dropdown/input)
+    `ttichange`: The Time-To-Interactive budget has been changed.
+
+    The component is used as follows:
+
+    <toolbar-controls
+      v-on:traceselected='reportTraceContent'
+      v-on:bundlesizechange='bundleSizeChanged'
+      v-on:networkchange='networkSpeedChanged'
+      v-on:ttichange= 'ttiChanged'
+    ></toolbar-controls>
+    -->
   <div class='horizontal controls tabbed-pane-header'>
     <!-- JavaScript bundle size -->
     <div class='controls-entry js-bundle-size'>
@@ -72,7 +92,7 @@ export default {
       var file = files[0]
       var reader = new FileReader()
       reader.onload = function (e) {
-        this.$emit('selected', e.target.result)
+        this.$emit('traceselected', e.target.result)
       }.bind(this)
       reader.readAsText(file)
     }

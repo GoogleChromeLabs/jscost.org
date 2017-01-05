@@ -1,15 +1,12 @@
-<!--
-TODO: What is the cost of inline x(y(item)) vs. foo(item) where the method does x(y(item)) for you.
-TODO: Start breaking things up into components
--->
 <template>
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
-    <my-controls
-      v-on:selected='reportTraceContent'
+
+    <toolbar-controls
+      v-on:traceselected='reportTraceContent'
       v-on:bundlesizechange='bundleSizeChanged'
       v-on:networkchange='networkSpeedChanged'
       v-on:ttichange= 'ttiChanged'
-    ></my-controls>
+    ></toolbar-controls>
 
     <template v-if="isCustomTraceSupplied()">
       <p>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. Parse ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}).
@@ -135,14 +132,14 @@ TODO: Start breaking things up into components
 <script>
 import deviceConfig from './Devices.js'
 import networkConditions from './Network.js'
-import controls from './Controls.vue'
+import controls from './ControlsToolbar.vue'
 import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
 
 export default {
   name: 'jscost',
   components: {
-    'my-controls': controls,
+    'toolbar-controls': controls,
     'timeline-legend': timelineLegend
   },
   data () {
