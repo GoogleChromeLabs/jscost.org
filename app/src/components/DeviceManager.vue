@@ -99,6 +99,11 @@
                 color="rgb(144, 183, 234)"
                 title="Evaluate"></timeline-legend>
 
+              <timeline-legend
+                :value="formatOutput(getEstimatedNetworkTransferTime())"
+                color="#CCDEF5"
+                title="Bundle Load Time"></timeline-legend>
+
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
@@ -156,7 +161,7 @@
               <timeline-legend
                 :value="formatOutput(getEstimatedNetworkTransferTime())"
                 color="#90B7EA"
-                title="Load (emulated)"></timeline-legend>
+                title="Page Load"></timeline-legend>
 
               <!--
               <div>
@@ -427,14 +432,14 @@ export default {
 }
 
 .device-entry {
-  height: 240px;
+  height: 260px;
   padding: 10px;
   text-align: center;
   display: block;
 }
 
 .hasCustomTrace .device-entry {
-  height: 400px;
+  height: 360px;
 }
 
 .hasCustomTrace .js-bundle-size, .hasCustomTrace .gzip-preview {

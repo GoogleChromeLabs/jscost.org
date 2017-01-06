@@ -20,15 +20,19 @@
       v-on:ttichange= 'ttiChanged'
     ></toolbar-controls>
     -->
-  <div class='horizontal controls tabbed-pane-header'>
+  <div class='horizontal controls tabbed-pane-header dark'>
+    <!-- Reset the state of the world -->
+    <input type='submit' value='Reset' v-on:click='reset'/>
+    <div class="toolbar-divider toolbar-item"></div>
+
     <!-- JavaScript bundle size -->
     <div class='controls-entry js-bundle-size'>
       <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
-      <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'>KB
-      <small class='gz'>{{computeGZippedSize}}KB gzipped</small>
+      <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'> KB
+      <small class='gz'>{{computeGZippedSize()}}KB gzipped</small>
     </div>
 
-    <div class="toolbar-divider toolbar-item flex"></div>
+    <div class="toolbar-divider toolbar-item"></div>
 
     <!-- Network emulation -->
     <div class='controls-entry change-network-speed'>
@@ -38,27 +42,25 @@
           {{ option.title }}
         </option>
       </select>
-      <input v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'>Kbps
-      <small class='gz gzip-preview'>{{computeDownloadTime}}ms for {{computeGZippedSize}}KB gz</small>
+      <input v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'> Kbps
+      <!--<small class='gz gzip-preview'>{{computeDownloadTime()}}ms for {{computeGZippedSize()}}KB gz</small>-->
     </div>
 
-    <div class="toolbar-divider toolbar-item flex"></div>
+    <div class="toolbar-divider toolbar-item"></div>
 
     <!-- Time to interactive -->
     <div class='controls-entry time-to-interactive'>
       <label for='input_tti'>Time-To-Interactive</label>
-      <input id='tti' v-model='timeToInteractiveBudget' v-on:input='changeTTI'>ms
+      <input id='tti' v-model='timeToInteractiveBudget' v-on:input='changeTTI'> ms
     </div>
 
-    <div class="toolbar-divider toolbar-item flex"></div>
+    <div class="toolbar-divider toolbar-item"></div>
 
     <!-- Upload custom Timeline trace -->
-    <div class='controls-entry'>
-      <input type='file' id='selectFile' v-on:change='customTraceSelected'/>
+    <div class='controls-entry custom-trace'>
+      <label for='selectFile'>Custom Timeline Trace</label>
+      <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
     </div>
-
-    <!-- Reset the state of the world -->
-    <button v-on:click='reset'>Reset</button>
   </div>
 </template>
 <script>
@@ -94,9 +96,9 @@ export default {
     },
     // Handle trace selection
     customTraceSelected (e) {
-      var files = e.target.files
-      var file = files[0]
-      var reader = new FileReader()
+      let files = e.target.files
+      let file = files[0]
+      let reader = new FileReader()
       reader.onload = function (e) {
         this.$emit('traceselected', e.target.result)
       }.bind(this)
@@ -106,14 +108,17 @@ export default {
     reset () {
       Object.assign(this.$data, getDefaultData())
       this.$emit('reset')
-    }
-  },
-  computed: {
+    },
     computeGZippedSize () {
-      return Math.floor(this.bundleSizeBudget * 0.25)
+      return Math.floor(this.bundleSizeBudget * 0.3)
     },
     computeDownloadTime () {
-      return ((((Math.floor(this.bundleSizeBudget * 0.25)) * 8) / this.downloadSpeed) * 1000).toFixed(0)
+      return this.calculateTransferRate(this.computeGZippedSize(this.bundleSizeBudget), this.downloadSpeed / 1000).toFixed(0)
+    },
+    calculateTransferRate (fileSizeMB, transferRateMbps) {
+      // http://superuser.com/a/361237
+      // [1024 Mio/Gio] * [8 Mb/Mio] / 94.92848% ≈ 8630
+      return ((8630 * (fileSizeMB / 1000)) / transferRateMbps)
     }
   }
 }
@@ -140,7 +145,7 @@ export default {
 }
 
 input {
-  /*width: 50px;*/
+  width: 60px;
 }
 
 .controls-entry {
@@ -153,6 +158,10 @@ input {
 
 label {
   font-weight: 700;
+}
+
+#selectFile {
+  width: 78px;
 }
 
 .hasCustomTrace .js-bundle-size, .hasCustomTrace .gzip-preview {
