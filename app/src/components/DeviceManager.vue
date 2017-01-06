@@ -66,13 +66,13 @@
       v-on:bundlesizechange='bundleSizeChanged'
       v-on:networkchange='networkSpeedChanged'
       v-on:ttichange= 'ttiChanged'
+      v-on:reset= 'reset'
     ></toolbar-controls>
 
     <template v-if="isCustomTraceSupplied()">
       <p>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. Parse ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}).
       Eval ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}).</p>
     </template>
-
 
     <div class='device-manager horizontal layout wrap'>
       <div v-for='item in devices' class='device-entry-container'>
@@ -142,11 +142,11 @@
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Minor GC'))"
                 color="#FAEAC2"
                 title="Minor GC"></timeline-legend>
-
+<!--
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'Run Microtasks'))"
                 color="#AAAAAA"
-                title="Microtasks"></timeline-legend>
+                title="Microtasks"></timeline-legend>-->
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceParseHTMLCSSTime(item))"
@@ -186,7 +186,6 @@
 
         </div>
       </div>
-
 </template>
 
 <script>
@@ -196,42 +195,41 @@ import controls from './ControlsToolbar.vue'
 import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
 
+function getDefaultData () {
+  return {
+    /* -- Budgets -- */
+    /* All synthetic benchmark timings are based on time to run 1048KB of 'average' JS */
+    baseSize: 1048,
+    /* Default JS bundle size target for the synthetic benchmark */
+    bundleSizeBudget: 1200,
+    /* Target time the app should be interactive in. Chrome suggests < 5000ms */
+    timeToInteractiveBudget: 5000,
+    /* -- Network -- */
+    /* Most developers are testing on desktop with a fast connection. */
+    /* Default to DevTools Wifi configuration that most traces will likely be based on */
+    downloadSpeed: 30000,
+    devices: deviceConfig,
+    network: networkConditions,
+    networkSelected: '30000',
+    /* -- Custom traces -- */
+    /* Only truthy when a valid custom trace was supplied */
+    hasCustomTrace: false,
+    /* If a custom trace is selected, store the trace stats */
+    traceStats: new Map(),
+    /* Load stats calculated from the custom trace */
+    customTraceDOMCompleteTime: 0,
+    customTraceDOMInteractiveTime: 0,
+    customTraceLoadingTime: 0
+  }
+}
+
 export default {
   name: 'jscost',
   components: {
     'toolbar-controls': controls,
     'timeline-legend': timelineLegend
   },
-  data () {
-    return {
-      /* -- Budgets -- */
-      /* All synthetic benchmark timings are based on time to run 1048KB of 'average' JS */
-      baseSize: 1048,
-      /* Default JS bundle size target for the synthetic benchmark */
-      bundleSizeBudget: 1200,
-      /* Target time the app should be interactive in. Chrome suggests < 5000ms */
-      timeToInteractiveBudget: 5000,
-      /* Scripting budget (Parse/Eval primarily) */
-      scriptingBudget: 3500,
-      /* -- Network -- */
-      /* Most developers are testing on desktop with a fast connection. */
-      /* Default to DevTools Wifi configuration that most traces will likely be based on */
-      downloadSpeed: 30000,
-      devices: deviceConfig,
-      network: networkConditions,
-      networkSelected: '30000',
-      /* -- Custom traces -- */
-      /* Only truthy when a valid custom trace was supplied */
-      hasCustomTrace: false,
-      /* If a custom trace is selected, store the trace stats */
-      traceStats: new Map(),
-      /* Load stats calculated from the custom trace */
-      customTraceDOMCompleteTime: 0,
-      customTraceDOMInteractiveTime: 0,
-      customTraceLoadingTime: 0
-
-    }
-  },
+  data: getDefaultData,
   methods: {
     isCustomTraceOverTTIBudget (item) {
       return (this.getCustomTraceEstimatedTTIRemaining(item) < -1)
@@ -406,6 +404,11 @@ export default {
       let result = new Map()
       tree.children.forEach((value, key) => result.set(key, value[timeValue].toFixed(1)))
       return result
+    },
+
+    /* 🚿 the world */
+    reset () {
+      Object.assign(this.$data, getDefaultData())
     }
   }
 }

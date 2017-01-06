@@ -56,23 +56,28 @@
     <div class='controls-entry'>
       <input type='file' id='selectFile' v-on:change='customTraceSelected'/>
     </div>
+
+    <!-- Reset the state of the world -->
+    <button v-on:click='reset'>Reset</button>
   </div>
 </template>
 <script>
 /* global FileReader */
 import networkConditions from './Network.js'
 
+function getDefaultData () {
+  return {
+    bundleSizeBudget: 1200,
+    gzippedBundleSize: 0,
+    downloadSpeed: 30000,
+    network: networkConditions,
+    networkSelected: '30000',
+    timeToInteractiveBudget: 5000
+  }
+}
+
 export default {
-  data () {
-    return {
-      bundleSizeBudget: 1200,
-      gzippedBundleSize: 0,
-      downloadSpeed: 30000,
-      network: networkConditions,
-      networkSelected: '30000',
-      timeToInteractiveBudget: 5000
-    }
-  },
+  data: getDefaultData,
   methods: {
     changeTTI () {
       this.$emit('ttichange', this.timeToInteractiveBudget)
@@ -96,6 +101,11 @@ export default {
         this.$emit('traceselected', e.target.result)
       }.bind(this)
       reader.readAsText(file)
+    },
+    /* 🚿 the world */
+    reset () {
+      Object.assign(this.$data, getDefaultData())
+      this.$emit('reset')
     }
   },
   computed: {
