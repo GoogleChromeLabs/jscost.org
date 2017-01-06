@@ -20,7 +20,7 @@
       v-on:ttichange= 'ttiChanged'
     ></toolbar-controls>
     -->
-  <div class='horizontal controls tabbed-pane-header dark'>
+  <div class='layout center-center horizontal controls tabbed-pane-header dark'>
     <!-- Reset the state of the world -->
     <input type='submit' value='Reset' v-on:click='reset'/>
     <div class="toolbar-divider toolbar-item"></div>
@@ -58,7 +58,7 @@
 
     <!-- Upload custom Timeline trace -->
     <div class='controls-entry custom-trace'>
-      <label for='selectFile'>Custom Timeline Trace</label>
+      <label for='selectFile'>Use A Timeline Trace</label>
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
     </div>
   </div>
