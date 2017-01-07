@@ -82,17 +82,17 @@ export default {
   data: getDefaultData,
   methods: {
     changeTTI () {
-      this.$emit('ttichange', this.timeToInteractiveBudget)
+      this.$emit('ttiChanged', this.timeToInteractiveBudget)
     },
     changeBundleSize () {
-      this.$emit('bundlesizechange', this.bundleSizeBudget)
+      this.$emit('bundlesizeChanged', this.bundleSizeBudget)
     },
     changeNetworkSpeed () {
       this.downloadSpeed = this.networkSelected
-      this.$emit('networkchange', this.downloadSpeed)
+      this.$emit('networkChanged', this.downloadSpeed)
     },
     changeCustomNetworkSpeed () {
-      this.$emit('networkchange', this.downloadSpeed)
+      this.$emit('networkChanged', this.downloadSpeed)
     },
     // Handle trace selection
     customTraceSelected (e) {
@@ -100,7 +100,7 @@ export default {
       let file = files[0]
       let reader = new FileReader()
       reader.onload = function (e) {
-        this.$emit('traceselected', e.target.result)
+        this.$emit('traceSelected', e.target.result)
       }.bind(this)
       reader.readAsText(file)
     },

@@ -62,11 +62,11 @@
   <div class='container vertical around-justified layout' v-bind:class="{ hasCustomTrace: hasCustomTrace }">
 
     <toolbar-controls
-      v-on:traceselected='reportTraceContent'
-      v-on:bundlesizechange='bundleSizeChanged'
-      v-on:networkchange='networkSpeedChanged'
-      v-on:ttichange= 'ttiChanged'
-      v-on:reset= 'reset'
+      @traceSelected='reportTraceContent'
+      @bundlesizeChanged='bundleSizeChanged'
+      @networkChanged='networkSpeedChanged'
+      @ttiChanged= 'ttiChanged'
+      @reset= 'reset'
     ></toolbar-controls>
 
     <template v-if="isCustomTraceSupplied()">
@@ -270,11 +270,11 @@ export default {
       from Devices.js.
     */
     getCustomTraceDeviceTotalScriptingTime (item) {
-      let JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
-      let CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
-      let EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
-      let MajorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Major GC')
-      let MinorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Minor GC')
+      const JSFrame = this.getCustomTraceEstimateForDeviceProp(item, 'JS Frame')
+      const CompileScript = this.getCustomTraceEstimateForDeviceProp(item, 'Compile Script')
+      const EvaluateScript = this.getCustomTraceEstimateForDeviceProp(item, 'Evaluate Script')
+      const MajorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Major GC')
+      const MinorGC = this.getCustomTraceEstimateForDeviceProp(item, 'Minor GC')
       return JSFrame + CompileScript + EvaluateScript + MajorGC + MinorGC
     },
 
