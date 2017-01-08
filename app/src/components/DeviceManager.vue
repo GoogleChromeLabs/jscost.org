@@ -70,8 +70,11 @@
     ></toolbar-controls>
 
     <template v-if="isCustomTraceSupplied()">
-      <p>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. Parse ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}).
-      Eval ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}).</p>
+      <p class='estimated-js-message'>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}) on Parse.
+      ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}) on Eval.</p>
+    </template>
+    <template v-else>
+      <p class='estimated-js-message'><strong>{{this.computeGZippedSize(this.bundleSizeBudget)}}KB</strong> (gzipped) of average JavaScript is estimated to perform as follows:</p>
     </template>
 
     <div class='device-manager horizontal layout wrap'>
@@ -87,7 +90,7 @@
               <timeline-legend
                 :value="formatOutput(computeSumRelativeToBudget(item))"
                 color="rgb(243, 210, 124)"
-                title="Total Scripting"></timeline-legend>
+                title="Time in JavaScript"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(computeValueRelativeToBudget('parse', item))"
@@ -107,7 +110,7 @@
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
-                <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
+                <span class='timeline-aggregated-legend-title'>TTI budget left:</span>
               </div>
             </div>
 
@@ -121,7 +124,7 @@
               <timeline-legend
                 :value="formatOutput(getCustomTraceDeviceTotalScriptingTime(item))"
                 color="rgb(243, 210, 124)"
-                title="Total Scripting"></timeline-legend>
+                title="Time in JavaScript"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))"
@@ -180,7 +183,7 @@
               <div v-bind:class="{ 'over-budget': isCustomTraceOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedTTIRemaining(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #CCDEF5'></span>
-                <span class='timeline-aggregated-legend-title'>TTI budget remaining</span>
+                <span class='timeline-aggregated-legend-title'>TTI budget left:</span>
               </div>
 
             </div>
@@ -461,6 +464,10 @@ label {
 
 .over-budget {
   background-color: rgb(255, 215, 215);
+}
+
+.estimated-js-message {
+  font-size: 2em;
 }
 
 /* Mobile styles */
