@@ -22,17 +22,16 @@
     -->
   <div class='layout center-center horizontal controls tabbed-pane-header dark'>
     <!-- Reset the state of the world -->
-    <input type='submit' value='Reset' v-on:click='reset'/>
-    <div class="toolbar-divider toolbar-item"></div>
+    <input type='submit' value='Reset' v-on:click='reset' v-show='advancedMode'/>
 
     <!-- JavaScript bundle size -->
     <div class='controls-entry js-bundle-size'>
-      <label for='input_jsbundleSizeBudget'>JavaScript Bundle Size</label>
+      <label for='input_jsbundleSizeBudget'>JavaScript Size</label>
       <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'> KB
       <small class='gz'>{{computeGZippedSize()}}KB gzipped</small>
     </div>
 
-    <div class="toolbar-divider toolbar-item"></div>
+    <div class='toolbar-divider toolbar-item'></div>
 
     <!-- Network emulation -->
     <div class='controls-entry change-network-speed'>
@@ -46,21 +45,25 @@
       <!--<small class='gz gzip-preview'>{{computeDownloadTime()}}ms for {{computeGZippedSize()}}KB gz</small>-->
     </div>
 
-    <div class="toolbar-divider toolbar-item"></div>
+    <div class='toolbar-divider toolbar-item' v-show='advancedMode'></div>
 
     <!-- Time to interactive -->
-    <div class='controls-entry time-to-interactive'>
+    <div class='controls-entry time-to-interactive' v-show='advancedMode'>
       <label for='input_tti'>Interactive in</label>
       <input id='tti' v-model='timeToInteractiveBudget' v-on:input='changeTTI'> ms
     </div>
 
-    <div class="toolbar-divider toolbar-item"></div>
+    <div class='toolbar-divider toolbar-item'></div>
 
     <!-- Upload custom Timeline trace -->
     <div class='controls-entry custom-trace'>
-      <label for='selectFile'>Timeline Trace from your app</label>
+      <!--<label for='selectFile'>Select Timeline Trace</label>-->
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
+      <input type='submit' id='uploadTimelineBtn' value='Upload Timeline Trace' @click='uploadTimelineTrace'/>
     </div>
+
+    <div class='toolbar-divider toolbar-item'></div>
+    <span @click='advancedMode = !advancedMode'>Advanced</span>
   </div>
 </template>
 <script>
@@ -74,7 +77,8 @@ function getDefaultData () {
     downloadSpeed: 30000,
     network: networkConditions,
     networkSelected: '30000',
-    timeToInteractiveBudget: 5000
+    timeToInteractiveBudget: 5000,
+    advancedMode: false
   }
 }
 
@@ -83,6 +87,9 @@ export default {
   methods: {
     isNetworkSpeedCustom () {
       return !!(this.networkSelected === 0)
+    },
+    uploadTimelineTrace () {
+      this.$el.querySelector('#selectFile').click()
     },
     changeTTI () {
       this.$emit('ttiChanged', this.timeToInteractiveBudget)
@@ -143,13 +150,20 @@ export default {
   background-color: #333333;
   color: #f3f3f3;
 }
-
 .controls.dark .gz {
   color: #F1DD3F
 }
 
 input {
   width: 60px;
+}
+
+#uploadTimelineBtn {
+  width: auto;
+}
+
+#selectFile {
+  display: none;
 }
 
 .controls-entry {
