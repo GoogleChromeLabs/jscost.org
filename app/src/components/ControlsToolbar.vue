@@ -58,7 +58,7 @@
 
     <!-- Upload custom Timeline trace -->
     <div class='controls-entry custom-trace'>
-      <label for='selectFile'>Use A Timeline Trace</label>
+      <label for='selectFile'>Timeline Trace from your app</label>
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
     </div>
   </div>
@@ -99,6 +99,7 @@ export default {
     },
     // Handle trace selection
     customTraceSelected (e) {
+      this.reset()
       let files = e.target.files
       let file = files[0]
       let reader = new FileReader()
