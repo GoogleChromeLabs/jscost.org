@@ -1,7 +1,7 @@
 {
   "name": "jscost",
   "version": "1.0.0",
-  "description": "jscost.org app",
+  "description": "JSCost",
   "author": "Addy Osmani",
   "private": true,
   "scripts": {

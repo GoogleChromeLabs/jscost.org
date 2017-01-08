@@ -1,18 +1,13 @@
-# jscost
+# JSCost - JavaScript Performance Estimator sample
 
-> jscost.org app
+This repository contains the complete sample code for the JSCost Performance
+Estimator sample. This shows how to use WebPageTest.org and the Chrome DevTools
+Timeline to estimate the performance of JavaScript on different mobile devices.
 
-## Build Setup
+## Contributing changes
 
-``` bash
-# install dependencies
-npm install
+* See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-# serve with hot reload at localhost:8080
-npm run dev
+## Licensing
 
-# build for production with minification
-npm run build
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+* See [LICENSE](LICENSE)
