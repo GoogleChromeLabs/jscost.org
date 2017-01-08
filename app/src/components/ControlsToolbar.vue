@@ -189,9 +189,6 @@ label {
   strong span {
     font-size: 1.3em;
   }
-  input {
-    width: 35px;
-  }
   .controls {
     text-align: left;
   }
