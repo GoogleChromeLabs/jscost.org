@@ -42,7 +42,7 @@
           {{ option.title }}
         </option>
       </select>
-      <input v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'> Kbps
+      <input v-show='isNetworkSpeedCustom()' v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'> Kbps
       <!--<small class='gz gzip-preview'>{{computeDownloadTime()}}ms for {{computeGZippedSize()}}KB gz</small>-->
     </div>
 
@@ -50,7 +50,7 @@
 
     <!-- Time to interactive -->
     <div class='controls-entry time-to-interactive'>
-      <label for='input_tti'>Time-To-Interactive</label>
+      <label for='input_tti'>Interactive in</label>
       <input id='tti' v-model='timeToInteractiveBudget' v-on:input='changeTTI'> ms
     </div>
 
@@ -81,6 +81,9 @@ function getDefaultData () {
 export default {
   data: getDefaultData,
   methods: {
+    isNetworkSpeedCustom () {
+      return !!(this.networkSelected === 0)
+    },
     changeTTI () {
       this.$emit('ttiChanged', this.timeToInteractiveBudget)
     },

@@ -1,4 +1,8 @@
 export default [{
+  title: 'Custom',
+  download: 0,
+  latency: 0
+}, {
   title: 'GPRS',
   download: 50, // 50kbps
   latency: 500 // 500ms

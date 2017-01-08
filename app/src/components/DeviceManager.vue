@@ -110,7 +110,7 @@
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
-                <span class='timeline-aggregated-legend-title'>TTI budget left:</span>
+                <span class='timeline-aggregated-legend-title'>Interactive time left:</span>
               </div>
             </div>
 
