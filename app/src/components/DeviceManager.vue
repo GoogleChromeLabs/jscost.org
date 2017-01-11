@@ -190,8 +190,6 @@
             <progress :max='timeToInteractiveBudget' :value='getCustomTraceSumOfTimeSpent(item)'>
             </progress>
           </template>
-
-
         </div>
       </div>
 </template>
@@ -215,10 +213,10 @@ function getDefaultData () {
     /* -- Network -- */
     /* Most developers are testing on desktop with a fast connection. */
     /* Default to DevTools Wifi configuration that most traces will likely be based on */
-    downloadSpeed: 30000,
+    downloadSpeed: 750,
     devices: deviceConfig,
     network: networkConditions,
-    networkSelected: '30000',
+    networkSelected: '750',
     /* -- Custom traces -- */
     /* Only truthy when a valid custom trace was supplied */
     hasCustomTrace: false,

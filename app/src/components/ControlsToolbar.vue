@@ -39,7 +39,8 @@
           {{ option.title }}
         </option>
       </select>
-      <input v-show='isNetworkSpeedCustom()' v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'> Kbps
+      <input v-show='isNetworkSpeedCustom()' v-model='downloadSpeed' id='input_downloadspeed' v-on:input='changeCustomNetworkSpeed'> 
+      <span v-show='isNetworkSpeedCustom()'> Kbps</span>
       <!--<small class='gz gzip-preview'>{{computeDownloadTime()}}ms for {{computeGZippedSize()}}KB gz</small>-->
     </div>
 
@@ -78,9 +79,9 @@ function getDefaultData () {
   return {
     bundleSizeBudget: 1200,
     gzippedBundleSize: 0,
-    downloadSpeed: 30000,
+    downloadSpeed: 750,
     network: networkConditions,
-    networkSelected: '30000',
+    networkSelected: '750',
     timeToInteractiveBudget: 5000,
     advancedMode: false,
     customTraceLoaded: false

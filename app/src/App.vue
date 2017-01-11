@@ -6,6 +6,7 @@
         </div>
     </div>    
     <deviceManager></deviceManager>
+    <footer>Built with 💜 by <a href='https://twitter.com/addyosmani'>@addyosmani</a></footer>
   </div>
 </template>
 
@@ -50,11 +51,14 @@ body {
     margin:0px auto;
     color: white;
 }
-
 #logo {
     font-weight: bold;
     font-size: 18px;
     padding-top: 10px;
     width: 90px;
+}
+footer {
+  padding: 50px;
+  font-size: 1.1em;
 }
 </style>
