@@ -69,8 +69,8 @@
       @reset= 'reset'
     ></toolbar-controls>
 
-    <template v-if="isCustomTraceSupplied()">
-      <p class='estimated-js-message'>Your trace spends ~{{formatOutput(getCustomTraceTotalScriptingTime())}} in JavaScript. ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}) on Parse.
+    <template v-if="hasCustomTrace">
+      <p class='estimated-js-message'>Your trace spends ~<strong>{{formatOutput(getCustomTraceTotalScriptingTime())}}</strong> in JavaScript. ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}) on Parse.
       ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}) on Eval.</p>
     </template>
     <template v-else>
@@ -84,7 +84,7 @@
           <div><img :src='item.image'/></div>
 
           <!-- Template for synthetic benchmark -->
-          <template v-if="traceStats.get('JS Frame') === undefined">
+          <template v-if="!hasCustomTrace">
             <div class='details'>
 
               <timeline-legend
@@ -118,7 +118,7 @@
             </progress>
           </template>
           <!-- A user supplied trace will toggle the more detailed view -->
-          <template v-else-if="isCustomTraceSupplied()">
+          <template v-else-if="hasCustomTrace">
             <div class='details'>
 
               <timeline-legend
