@@ -29,7 +29,7 @@
       <small class='gz'>{{computeGZippedSize()}}KB gzipped</small>
     </div>
 
-    <div class='toolbar-divider toolbar-item'></div>
+    <div class='toolbar-divider toolbar-item' v-show='!customTraceLoaded'></div>
 
     <!-- Network emulation -->
     <div class='controls-entry change-network-speed'>
