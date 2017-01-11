@@ -67,7 +67,7 @@
     </div>
 
     <div class='toolbar-divider toolbar-item'></div>
-    <span @click='advancedMode = !advancedMode'>Advanced</span>
+    <span @click='advancedMode = !advancedMode' class='advanced'>Advanced</span>
   </div>
 </template>
 <script>
@@ -211,6 +211,14 @@ label {
   }
   .controls {
     text-align: left;
+  }
+  .advanced {
+    float: right;
+    padding: 5px;
+  }
+  #uploadTimelineBtn {
+    /*width: 100%;*/
+    display: none;
   }
 }
 </style>

@@ -479,5 +479,18 @@ label {
   .device-entry-container {
     margin: 0 auto;
   }
+  .device-entry {
+    height: 320px;
+  }
+  .device-entry .details {
+    font-size: 1.2em;
+  }
+  .device-entry strong {
+    font-size: 1.3em;
+  }
+  .estimated-js-message {
+    font-size: 1.1em;
+    padding: 2px;
+  }
 }
 </style>
