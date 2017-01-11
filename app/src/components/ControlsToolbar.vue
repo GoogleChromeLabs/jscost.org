@@ -21,8 +21,6 @@
     ></toolbar-controls>
     -->
   <div class='layout center-center horizontal controls tabbed-pane-header dark'>
-    <!-- Reset the state of the world -->
-    <input type='submit' value='Reset' v-on:click='reset' v-show='advancedMode'/>
 
     <!-- JavaScript bundle size -->
     <div class='controls-entry js-bundle-size'>
@@ -62,6 +60,12 @@
       <input type='submit' id='uploadTimelineBtn' value='Upload Timeline Trace' @click='uploadTimelineTrace'/>
     </div>
 
+    <!-- Reset the state of the world -->
+    <div class='toolbar-divider toolbar-item' v-show='customTraceLoaded'></div>
+    <div class='controls-entry custom-trace' v-show='customTraceLoaded'>
+      <input type='submit' value='Reset' v-on:click='reset'/>
+    </div>
+
     <div class='toolbar-divider toolbar-item'></div>
     <span @click='advancedMode = !advancedMode'>Advanced</span>
   </div>
@@ -78,7 +82,8 @@ function getDefaultData () {
     network: networkConditions,
     networkSelected: '30000',
     timeToInteractiveBudget: 5000,
-    advancedMode: false
+    advancedMode: false,
+    customTraceLoaded: false
   }
 }
 
@@ -112,6 +117,7 @@ export default {
       let reader = new FileReader()
       reader.onload = function (e) {
         this.$emit('traceSelected', e.target.result)
+        this.customTraceLoaded = true
       }.bind(this)
       reader.readAsText(file)
     },
