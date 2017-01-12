@@ -195,28 +195,15 @@
 </template>
 
 <script>
+import config from './Config.js'
 import deviceConfig from './Devices.js'
-import networkConditions from './Network.js'
 import controls from './ControlsToolbar.vue'
 import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
 
 function getDefaultData () {
-  return {
-    /* -- Budgets -- */
-    /* All synthetic benchmark timings are based on time to run 1048KB of 'average' JS */
-    baseSize: 1048,
-    /* Default JS bundle size target for the synthetic benchmark */
-    bundleSizeBudget: 1200,
-    /* Target time the app should be interactive in. Chrome suggests < 5000ms */
-    timeToInteractiveBudget: 5000,
-    /* -- Network -- */
-    /* Most developers are testing on desktop with a fast connection. */
-    /* Default to DevTools Wifi configuration that most traces will likely be based on */
-    downloadSpeed: 750,
-    devices: deviceConfig,
-    network: networkConditions,
-    networkSelected: '750',
+  let defaults = config
+  Object.assign(defaults, {
     /* -- Custom traces -- */
     /* Only truthy when a valid custom trace was supplied */
     hasCustomTrace: false,
@@ -226,7 +213,8 @@ function getDefaultData () {
     customTraceDOMCompleteTime: 0,
     customTraceDOMInteractiveTime: 0,
     customTraceLoadingTime: 0
-  }
+  })
+  return defaults
 }
 
 export default {

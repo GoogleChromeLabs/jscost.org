@@ -73,19 +73,15 @@
 </template>
 <script>
 /* global FileReader */
-import networkConditions from './Network.js'
+import config from './Config.js'
 
 function getDefaultData () {
-  return {
-    bundleSizeBudget: 1200,
-    gzippedBundleSize: 0,
-    downloadSpeed: 750,
-    network: networkConditions,
-    networkSelected: '750',
-    timeToInteractiveBudget: 5000,
+  let defaults = config
+  Object.assign(defaults, {
     advancedMode: false,
     customTraceLoaded: false
-  }
+  })
+  return defaults
 }
 
 export default {
