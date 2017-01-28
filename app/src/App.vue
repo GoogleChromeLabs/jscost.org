@@ -3,9 +3,10 @@
     <div class="header-cont">
         <div class="header">
           <img id="logo" src="/static/logo.svg"/>
+          <span>A JavaScript cost visualization tool</span>
         </div>
     </div>    
-    <deviceManager></deviceManager>
+    <deviceManager id="manager"></deviceManager>
     <footer>Built with 💜 by <a href='https://twitter.com/addyosmani'>Addy Osmani</a></footer>
   </div>
 </template>
@@ -44,11 +45,18 @@ body {
     z-index: 999;
 }
 .header {
-    height:50px;
+    /*height:75px;*/
     background:#333333;
     width:100%;
     margin:0px auto;
     color: white;
+}
+.header span {
+  display: block;
+  height: 23px;
+}
+#manager .dark {
+  margin-top: 10px;
 }
 #logo {
     font-weight: bold;
