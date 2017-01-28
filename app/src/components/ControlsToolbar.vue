@@ -58,13 +58,13 @@
     <div class='controls-entry custom-trace'>
       <!--<label for='selectFile'>Select Timeline Trace</label>-->
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
-      <input class='mdl-button mdl-button--colored mdl-button--raised ' type='submit' id='uploadTimelineBtn' value='Select DevTools Trace' @click='uploadTimelineTrace'/>
+      <input class='mdl-button mdl-button--colored mdl-button--raised' type='submit' id='uploadTimelineBtn' value='Select DevTools Trace' @click='uploadTimelineTrace'/>
     </div>
 
     <!-- Reset the state of the world -->
     <div class='toolbar-divider toolbar-item' v-show='customTraceLoaded'></div>
     <div class='controls-entry custom-trace' v-show='customTraceLoaded'>
-      <input type='submit' value='Reset' v-on:click='reset'/>
+      <input class='mdl-button mdl-button--colored mdl-button--raised' type='submit' value='Reset' v-on:click='reset'/>
     </div>
 
     <div class='toolbar-divider toolbar-item'></div>
@@ -199,7 +199,7 @@ label {
     /*height: 36px;*/
     margin: 0;
     min-width: 64px;
-    padding: 0 16px;
+    /*padding: 0 16px;*/
     display: inline-block;
     font-family: "Roboto","Helvetica","Arial",sans-serif;
     font-size: 14px;
