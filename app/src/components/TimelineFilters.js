@@ -23,12 +23,20 @@ export function _filterEventsForLoadEventEnd (e) {
   return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd'
 }
 
+export function _filterEventsForFetchStart (e) {
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'fetchStart'
+}
+
 export function _filterEventsForDomLoading (e) {
   return e.categoriesString.includes('blink.user_timing') && e.name === 'domLoading'
 }
 
 export function _filterEventsForDomComplete (e) {
   return e.categoriesString.includes('blink.user_timing') && e.name === 'domComplete'
+}
+
+export function _filterEventsForDomContentLoadedEventEnd (e) {
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'domContentLoadedEventEnd'
 }
 
 export function _filterEventsForDomInteractive (e) {

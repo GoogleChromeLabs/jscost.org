@@ -6,7 +6,7 @@
         </div>
     </div>    
     <deviceManager></deviceManager>
-    <footer>Built with 💜 by <a href='https://twitter.com/addyosmani'>@addyosmani</a></footer>
+    <footer>Built with 💜 by <a href='https://twitter.com/addyosmani'>Addy Osmani</a></footer>
   </div>
 </template>
 
@@ -23,7 +23,6 @@ export default {
 
 <style>
 #app {
-  /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
   font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -60,5 +59,11 @@ body {
 footer {
   padding: 50px;
   font-size: 1.1em;
+}
+
+footer a {
+  text-decoration: none;
+  font-weight: 700;
+  color: #666;
 }
 </style>

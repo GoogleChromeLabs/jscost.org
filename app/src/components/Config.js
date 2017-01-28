@@ -30,5 +30,14 @@ export default {
   network: networkConditions,
   networkSelected: '750', // 3G
   /* Target time the app should be interactive in. Chrome suggests < 5s */
-  timeToInteractiveBudget: 5000
+  timeToInteractiveBudget: 5000,
+  advancedMode: false,
+  hasCustomTrace: false,
+  customTraceLoaded: false,
+  /* If a custom trace is selected, store for the trace stats */
+  traceStats: new Map(),
+  /* Load stats calculated from the custom trace */
+  customTraceDOMCompleteTime: 0,
+  customTraceDOMInteractiveTime: 0,
+  customTraceLoadingTime: 0
 }

@@ -74,7 +74,7 @@
       ({{formatOutput(getCustomTraceValueFor('Evaluate Script'))}}) on Eval.</p>
     </template>
     <template v-else>
-      <p class='estimated-js-message'><strong>{{this.computeGZippedSize(this.bundleSizeBudget)}}KB</strong> (gzipped) of average JavaScript is estimated to perform as follows:</p>
+      <p class='estimated-js-message'><strong>{{this.computeGZippedSize(this.bundleSizeBudget)}}KB</strong> (gzipped) of average JavaScript is estimated to load as follows:</p>
     </template>
 
     <div class='device-manager horizontal layout wrap'>
@@ -90,7 +90,7 @@
               <timeline-legend
                 :value="formatOutput(computeSumRelativeToBudget(item))"
                 color="rgb(243, 210, 124)"
-                title="Time in JavaScript"></timeline-legend>
+                title="JavaScript Start-up"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(computeValueRelativeToBudget('parse', item))"
@@ -202,18 +202,8 @@ import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
 
 function getDefaultData () {
-  let defaults = config
-  Object.assign(defaults, {
-    /* -- Custom traces -- */
-    /* Only truthy when a valid custom trace was supplied */
-    hasCustomTrace: false,
-    /* If a custom trace is selected, store the trace stats */
-    traceStats: new Map(),
-    /* Load stats calculated from the custom trace */
-    customTraceDOMCompleteTime: 0,
-    customTraceDOMInteractiveTime: 0,
-    customTraceLoadingTime: 0
-  })
+  let defaults = {}
+  Object.assign(defaults, config)
   return defaults
 }
 
@@ -313,7 +303,7 @@ export default {
     },
 
     getEstimatedNetworkTransferTime () {
-      return this.calculateTransferRate(this.computeGZippedSize(this.bundleSizeBudget), this.downloadSpeed / 1000)
+      return this.calculateTransferTime(this.computeGZippedSize(this.bundleSizeBudget), this.downloadSpeed / 1000)
     },
 
     getCustomTraceSumOfTimeSpent (item) {
@@ -339,11 +329,20 @@ export default {
     /*
       Estimate how long it would take to transfer Nmb using a connection
       with a known transfer rate.
+      This will compute total transfer time in seconds.
     */
-    calculateTransferRate (fileSizeMB, transferRateMbps) {
+    calculateTransferTime (fileSizeMB, transferRateMbps) {
       // http://superuser.com/a/361237
       // [1024 Mio/Gio] * [8 Mb/Mio] / 94.92848% ≈ 8630
       return ((8630 * (fileSizeMB / 1000)) / transferRateMbps)
+    },
+
+    estimateTracePageSize (loadTimeInSeconds) {
+      // 30 = desktop wifi transfer rate. we assume most are desktop traces.
+      // return ((30 * loadTimeInSeconds) / 8630) * 1000
+      // return ((loadTimeInSeconds * 30) / 8630) / 1000
+      return ((30 * loadTimeInSeconds) / 8630) * 1000
+      // returns MBs
     },
 
     computeGZippedSize (uncompressedRequestSize) {
@@ -378,17 +377,40 @@ export default {
 
         // Compute loading durations
         const events = model.timelineModel().mainThreadEvents()
-        let domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
-        let domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
-        let domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
-        let navStart = events.filter(TimelineFilters._filterEventsForNavStart)
-        let loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
+        const domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
+        const domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
+        const domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
+        const domContentLoadedEventEnd = events.filter(TimelineFilters._filterEventsForDomContentLoadedEventEnd)
+        const navStart = events.filter(TimelineFilters._filterEventsForNavStart)
+        const firstTextPaintEvent = events.filter(TimelineFilters._filterEventsForFirstTextPaint)
+        const fetchStart = events.filter(TimelineFilters._filterEventsForFetchStart)
+        const loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
 
+        // let loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
         this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
-        this.customTraceLoadingTime = Math.floor(loadEventEnd[0].startTime - navStart[0].startTime)
+        // this.customTraceLoadingTime = Math.floor(loadEventEnd[0].startTime - navStart[0].startTime)
+        // window.performance.timing.domContentLoadedEventEnd- window.performance.timing.navigationStart
+        this.customTraceLoadingTime = Math.floor(domContentLoadedEventEnd[0].startTime - navStart[0].startTime)
+        // new
+        this.customTraceSimpleFMP = Math.floor(firstTextPaintEvent[0].startTime - navStart[0].startTime)
+        this.customTraceNewLoadTime = Math.floor(loadEventEnd[0].startTime - fetchStart[0].startTime)
 
-        this.bundleSizeBudget = (this.customTraceLoadingTime / 80) * 300
+        console.info(`DOM Interactive: ${this.customTraceDOMInteractiveTime}ms`)
+        console.info(`Loading Time: ${this.customTraceLoadingTime}ms`)
+        console.info(`FMP: ${this.customTraceSimpleFMP}ms`)
+        console.info(`New Loading Time: ${this.customTraceNewLoadTime}`)
+
+        // Note: for 'Wifi' this should be around 4.2s for theverge.com
+        // Important: Traces do NOT currently expose size of their JavaScript.
+        // When in custom trace mode, we instead look at transfer time for the
+        // overall page. Load time estimations then look at this when calculating
+        // how long it will take to transfer.
+        // MS -> Seconds * (MB -> KB)
+        this.bundleSizeBudget = this.estimateTracePageSize(this.customTraceLoadingTime * 1000)
+        // Confirmed: if you know the correct budget size, load time from here will be right.
+        console.info(`Estimated page size: ${this.bundleSizeBudget}`)
+        console.info(`Estimated transfer time on WiFi ${this.calculateTransferTime(this.bundleSizeBudget / 1000, 30)}`)
 
         // Finally hint to UI that a custom trace was supplied
         this.hasCustomTrace = true
@@ -416,7 +438,7 @@ export default {
 .device-manager {
   padding: 10px;
   display: flex;
-  max-width: 90%;
+  max-width: 96%;
   margin: 0 auto;
 }
 

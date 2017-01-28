@@ -23,13 +23,13 @@
   <div class='layout center-center horizontal controls tabbed-pane-header dark'>
 
     <!-- JavaScript bundle size -->
-    <div class='controls-entry js-bundle-size'>
+    <!--<div class='controls-entry js-bundle-size'>
       <label for='input_jsbundleSizeBudget'>JavaScript Size</label>
       <input v-model='bundleSizeBudget' id='input_jsbundleSizeBudget' v-on:input='changeBundleSize'> KB
       <small class='gz'>{{computeGZippedSize()}}KB gzipped</small>
     </div>
 
-    <div class='toolbar-divider toolbar-item' v-show='!customTraceLoaded'></div>
+    <div class='toolbar-divider toolbar-item' v-show='!customTraceLoaded'></div>-->
 
     <!-- Network emulation -->
     <div class='controls-entry change-network-speed'>
@@ -58,7 +58,7 @@
     <div class='controls-entry custom-trace'>
       <!--<label for='selectFile'>Select Timeline Trace</label>-->
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
-      <input type='submit' id='uploadTimelineBtn' value='Upload Timeline Trace' @click='uploadTimelineTrace'/>
+      <input type='submit' id='uploadTimelineBtn' value='Select Timeline Trace' @click='uploadTimelineTrace'/>
     </div>
 
     <!-- Reset the state of the world -->
@@ -68,7 +68,8 @@
     </div>
 
     <div class='toolbar-divider toolbar-item'></div>
-    <span @click='advancedMode = !advancedMode' class='advanced'>Advanced</span>
+    <!-- BUG: This isn't toggling -->
+    <span @click='toggleAdvanced' class='advanced'>Advanced</span>
   </div>
 </template>
 <script>
@@ -76,11 +77,8 @@
 import config from './Config.js'
 
 function getDefaultData () {
-  let defaults = config
-  Object.assign(defaults, {
-    advancedMode: false,
-    customTraceLoaded: false
-  })
+  let defaults = {}
+  Object.assign(defaults, config)
   return defaults
 }
 
@@ -122,6 +120,9 @@ export default {
     reset () {
       Object.assign(this.$data, getDefaultData())
       this.$emit('reset')
+    },
+    toggleAdvanced () {
+      this.advancedMode = !this.advancedMode
     },
     computeGZippedSize () {
       return Math.floor(this.bundleSizeBudget * 0.3)
