@@ -86,6 +86,10 @@
           <!-- Template for synthetic benchmark -->
           <template v-if="!hasCustomTrace">
             <div class='details'>
+              <timeline-legend
+                :value="formatOutput(getEstimatedNetworkTransferTime())"
+                color="#CCDEF5"
+                title="Bundle Load Time"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(computeSumRelativeToBudget(item))"
@@ -102,15 +106,10 @@
                 color="rgb(144, 183, 234)"
                 title="Evaluate"></timeline-legend>
 
-              <timeline-legend
-                :value="formatOutput(getEstimatedNetworkTransferTime())"
-                color="#CCDEF5"
-                title="Bundle Load Time"></timeline-legend>
-
               <div v-bind:class="{ 'over-budget': isBenchmarkOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(computeTTIRemainder(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: rgb(222, 222, 222);'></span>
-                <span class='timeline-aggregated-legend-title'>Interactive time left:</span>
+                <span class='timeline-aggregated-legend-title'>Interactivity Budget Left:</span>
               </div>
             </div>
 
@@ -183,7 +182,7 @@
               <div v-bind:class="{ 'over-budget': isCustomTraceOverTTIBudget(item) }">
                 <span class='timeline-aggregated-legend-value'>{{formatOutput(getCustomTraceEstimatedTTIRemaining(item))}}</span>
                 <span class='timeline-aggregated-legend-swatch' style='background-color: #CCDEF5'></span>
-                <span class='timeline-aggregated-legend-title'>TTI budget left:</span>
+                <span class='timeline-aggregated-legend-title'>Interactivity Budget:</span>
               </div>
 
             </div>
