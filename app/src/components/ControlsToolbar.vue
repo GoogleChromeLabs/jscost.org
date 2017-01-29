@@ -106,6 +106,7 @@ export default {
     },
     // Handle trace selection
     customTraceSelected (e) {
+      this.$emit('beforeTraceRead')
       this.reset()
       let files = e.target.files
       let file = files[0]

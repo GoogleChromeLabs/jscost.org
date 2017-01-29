@@ -63,11 +63,14 @@
 
     <toolbar-controls
       @traceSelected='reportTraceContent'
+      @beforeTraceRead='traceReadStatusChanged'
       @bundlesizeChanged='bundleSizeChanged'
       @networkChanged='networkSpeedChanged'
       @ttiChanged= 'ttiChanged'
       @reset= 'reset'
     ></toolbar-controls>
+
+    <div>{{traceProcessingState}}</div>
 
     <template v-if="hasCustomTrace">
       <p class='estimated-js-message'>Your trace spends ~<strong>{{formatOutput(getCustomTraceTotalScriptingTime())}}</strong> in JavaScript. ({{formatOutput(getCustomTraceValueFor('Compile Script'))}}) on Parse.
@@ -201,7 +204,9 @@ import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
 
 function getDefaultData () {
-  let defaults = {}
+  let defaults = {
+    traceProcessingState: ''
+  }
   Object.assign(defaults, config)
   return defaults
 }
@@ -366,13 +371,23 @@ export default {
       this.traceStats = trace
     },
 
+    traceReadStatusChanged () {
+      setTimeout(function () {
+        this.traceProcessingState = 'Processing DevTools Timeline Trace...'
+      }.bind(this), 0)
+    },
+
     reportTraceContent (trace, filename) {
       require(['devtools-timeline-model-browser'], (d) => {
+        this.traceProcessingState = 'Generating DevTools Timeline Model...'
         const model = new window.TimelineModelBrowser(trace)
+        this.traceProcessingState = 'Grouping model by EventName...'
         const bottomUpByName = model.bottomUpGroupBy('EventName')
         const tree = this.dumpTree(bottomUpByName, 'selfTime')
         // Bottom up tree grouped by EventName
         this.storeTraceStats(tree['_c'])
+
+        this.traceProcessingState = 'Filtering for load events...'
 
         // Compute loading durations
         const events = model.timelineModel().mainThreadEvents()
@@ -406,11 +421,12 @@ export default {
         // overall page. Load time estimations then look at this when calculating
         // how long it will take to transfer.
         // MS -> Seconds * (MB -> KB)
+        this.traceProcessingState = 'Calculating trace page size...'
         this.bundleSizeBudget = this.estimateTracePageSize(this.customTraceLoadingTime * 1000)
         // Confirmed: if you know the correct budget size, load time from here will be right.
         console.info(`Estimated page size: ${this.bundleSizeBudget}`)
         console.info(`Estimated transfer time on WiFi ${this.calculateTransferTime(this.bundleSizeBudget / 1000, 30)}`)
-
+        this.traceProcessingState = ''
         // Finally hint to UI that a custom trace was supplied
         this.hasCustomTrace = true
       })
