@@ -15,34 +15,41 @@
  * limitations under the License.
  */
 
+// Thanks to Paul Irish for helping me figure out how to filter these babies down correctly <3
+let ourframe
+
+export function setFrameId (id) {
+  ourframe = id
+}
+
 export function _filterEventsForNavStart (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'navigationStart'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'navigationStart' && e.args.frame === ourframe
 }
 
 export function _filterEventsForLoadEventEnd (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'loadEventEnd' && e.args.frame === ourframe
 }
 
 export function _filterEventsForFetchStart (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'fetchStart'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'fetchStart' && e.args.frame === ourframe
 }
 
 export function _filterEventsForDomLoading (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'domLoading'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'domLoading' && e.args.frame === ourframe
 }
 
 export function _filterEventsForDomComplete (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'domComplete'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'domComplete' && e.args.frame === ourframe
 }
 
 export function _filterEventsForDomContentLoadedEventEnd (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'domContentLoadedEventEnd'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'domContentLoadedEventEnd' && e.args.frame === ourframe
 }
 
 export function _filterEventsForDomInteractive (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'domInteractive'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'domInteractive' && e.args.frame === ourframe
 }
 
 export function _filterEventsForFirstTextPaint (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint'
+  return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint' && e.args.frame === ourframe
 }

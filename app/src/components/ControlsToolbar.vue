@@ -122,6 +122,10 @@ export default {
       Object.assign(this.$data, getDefaultData())
       this.$emit('reset')
     },
+    setNetwork (kbps) {
+      this.downloadSpeed = kbps
+      this.networkSelected = kbps.toString()
+    },
     toggleAdvanced () {
       this.advancedMode = !this.advancedMode
     },

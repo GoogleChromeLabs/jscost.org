@@ -68,6 +68,7 @@
       @networkChanged='networkSpeedChanged'
       @ttiChanged= 'ttiChanged'
       @reset= 'reset'
+      id='toolbar'
     ></toolbar-controls>
 
     <div>{{traceProcessingState}}</div>
@@ -202,6 +203,7 @@ import deviceConfig from './Devices.js'
 import controls from './ControlsToolbar.vue'
 import timelineLegend from './TimelineLegend.vue'
 import * as TimelineFilters from './TimelineFilters.js'
+import * as downloadCalculator from './downloadCalculator.js'
 
 function getDefaultData () {
   let defaults = {
@@ -341,13 +343,13 @@ export default {
       return ((8630 * (fileSizeMB / 1000)) / transferRateMbps)
     },
 
-    estimateTracePageSize (loadTimeInSeconds) {
-      // 30 = desktop wifi transfer rate. we assume most are desktop traces.
-      // return ((30 * loadTimeInSeconds) / 8630) * 1000
-      // return ((loadTimeInSeconds * 30) / 8630) / 1000
-      return ((30 * loadTimeInSeconds) / 8630) * 1000
-      // returns MBs
-    },
+    // estimateTracePageSize (loadTimeInSeconds) {
+    //   // 30 = desktop wifi transfer rate. we assume most are desktop traces.
+    //   // return ((30 * loadTimeInSeconds) / 8630) * 1000
+    //   // return ((loadTimeInSeconds * 30) / 8630) / 1000
+    //   return ((30 * loadTimeInSeconds) / 8630) * 1000
+    //   // returns MBs
+    // },
 
     computeGZippedSize (uncompressedRequestSize) {
       // This is at best a guess and in real-world situations you would
@@ -391,6 +393,10 @@ export default {
 
         // Compute loading durations
         const events = model.timelineModel().mainThreadEvents()
+
+        const tracingStarted = events.find(e => e.name === 'TracingStartedInPage')
+        TimelineFilters.setFrameId(tracingStarted.args.data.page)
+
         const domLoading = events.filter(TimelineFilters._filterEventsForDomLoading)
         const domComplete = events.filter(TimelineFilters._filterEventsForDomComplete)
         const domInteractive = events.filter(TimelineFilters._filterEventsForDomInteractive)
@@ -400,6 +406,7 @@ export default {
         const fetchStart = events.filter(TimelineFilters._filterEventsForFetchStart)
         const loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
 
+        // console.log('counts:', loadEventEnd.length, fetchStart.length)
         // let loadEventEnd = events.filter(TimelineFilters._filterEventsForLoadEventEnd)
         this.customTraceDOMCompleteTime = Math.floor(domComplete[0].startTime - domLoading[0].startTime)
         this.customTraceDOMInteractiveTime = Math.floor(domInteractive[0].startTime - domLoading[0].startTime)
@@ -410,9 +417,9 @@ export default {
         this.customTraceSimpleFMP = Math.floor(firstTextPaintEvent[0].startTime - navStart[0].startTime)
         this.customTraceNewLoadTime = Math.floor(loadEventEnd[0].startTime - fetchStart[0].startTime)
 
-        console.info(`DOM Interactive: ${this.customTraceDOMInteractiveTime}ms`)
-        console.info(`Loading Time: ${this.customTraceLoadingTime}ms`)
-        console.info(`FMP: ${this.customTraceSimpleFMP}ms`)
+        // console.info(`DOM Interactive: ${this.customTraceDOMInteractiveTime}ms`)
+        // console.info(`Loading Time: ${this.customTraceLoadingTime}ms`)
+        // console.info(`FMP: ${this.customTraceSimpleFMP}ms`)
         console.info(`New Loading Time: ${this.customTraceNewLoadTime}`)
 
         // Note: for 'Wifi' this should be around 4.2s for theverge.com
@@ -422,10 +429,22 @@ export default {
         // how long it will take to transfer.
         // MS -> Seconds * (MB -> KB)
         this.traceProcessingState = 'Calculating trace page size...'
-        this.bundleSizeBudget = this.estimateTracePageSize(this.customTraceLoadingTime * 1000)
+        // customTraceNewLoadTime is what all custom load times need to start off from (assuming desktop.)
+        // this.bundleSizeBudget = this.estimateTracePageSize(this.customTraceNewLoadTime * 1000)
+
+        const traceLoadTimeInSeconds = this.customTraceNewLoadTime / 1000
+        console.info(`Trace Loading Time in seconds: ${traceLoadTimeInSeconds}`)
+        // 30 is used here as the speed for Wifi (30mbps per devtools network emulation)
+        // Divide by 1000 for bytes -> KBs
+        // this.networkSelected = '30000'
+        // this.downloadSpeed = 30000
+        // this.$el.querySelector('#toolbar').methods.setNetwork(30000)
+        this.bundleSizeBudget = Math.floor(downloadCalculator.calculateDownloadSize(traceLoadTimeInSeconds, 30)) * 1000
+
         // Confirmed: if you know the correct budget size, load time from here will be right.
         console.info(`Estimated page size: ${this.bundleSizeBudget}`)
-        console.info(`Estimated transfer time on WiFi ${this.calculateTransferTime(this.bundleSizeBudget / 1000, 30)}`)
+
+        // console.info(`Estimated transfer time on WiFi ${this.calculateTransferTime(this.bundleSizeBudget / 1000, 30)}`)
         this.traceProcessingState = ''
         // Finally hint to UI that a custom trace was supplied
         this.hasCustomTrace = true
