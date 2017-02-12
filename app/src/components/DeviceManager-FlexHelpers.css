@@ -6,7 +6,6 @@
   .layout.horizontal-reverse,
   .layout.vertical,
   .layout.vertical-reverse {
-    display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
   }

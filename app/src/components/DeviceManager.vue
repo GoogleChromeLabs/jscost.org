@@ -85,7 +85,7 @@
       <div v-for='item in devices' class='device-entry-container'>
         <div class='device-entry'>
           <div><strong><span>{{item.name}}</span></strong></div>
-          <div><img :src='item.image'/></div>
+          <div><img :src='item.image' :alt='item.name'/></div>
 
           <!-- Template for synthetic benchmark -->
           <template v-if="!hasCustomTrace">
