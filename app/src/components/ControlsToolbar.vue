@@ -252,9 +252,17 @@ label {
     float: right;
     padding: 5px;
   }
+  select {
+    background-color: white;
+    border-width: 1px;
+  }
   #uploadTimelineBtn {
     /*width: 100%;*/
     display: none;
+  }
+  #manager .dark {
+    margin-top: 15px;
+    padding-left: 2px;    
   }
 }
 </style>
