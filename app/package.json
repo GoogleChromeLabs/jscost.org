@@ -6,11 +6,13 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src"
+    "build": "node build/build.js && npm run offline",
+    "lint": "eslint --ext .js,.vue src",
+    "offline": "sw-precache --root=dist"
   },
   "dependencies": {
     "devtools-timeline-model-browser": "^1.0.2",
+    "sw-precache": "^4.3.0",
     "vue": "^2.1.0"
   },
   "devDependencies": {
