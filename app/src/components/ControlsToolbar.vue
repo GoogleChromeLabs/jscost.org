@@ -228,7 +228,7 @@ label {
 
 
 /* Mobile styles */
-@media (max-width: 1250px) {
+@media (max-width: 800px) {
   .tabbed-pane-header {
     display: block;
   }

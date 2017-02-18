@@ -20,7 +20,14 @@ export default [{
   'parse': 233.12,
   'eval': 11.84,
   'type': 'desktop',
-  'image': './static/macbook-pro.jpg'
+  'image': './static/macbook-pro.jpg',
+  'rcs_compile': 862,
+  'rcs_parse': 287,
+  'rcs_runtime': 84,
+  'rcs_javascript': 73,
+  'rcs_callback': 56,
+  'rcs_gc': 34,
+  'rcs_ic': 14
 }, {
   'name': 'Macbook Pro - Safari 10',
   'parse': 69.914,
@@ -42,7 +49,13 @@ export default [{
   'name': 'Moto G4 - Chrome 55',
   'parse': 1429,
   'eval': 73,
-  'image': './static/motog4.jpg'
+  'image': './static/motog4.jpg',
+  'rcs_compile': 1235,
+  'rcs_runtime': 95,
+  'rcs_javascript': 40,
+  'rcs_parse': 403,
+  'rcs_gc': 17,
+  'rcs_ic': 3
 }, {
   'name': 'Nexus 5X - Chrome 55',
   'parse': 1038.965,
@@ -52,7 +65,13 @@ export default [{
   'name': 'Nexus 5 - Chrome 55',
   'parse': 1834.46,
   'eval': 200.435,
-  'image': './static/nexus5.jpg'
+  'image': './static/nexus5.jpg',
+  'rcs_compile': 1417,
+  'rcs_runtime': 88,
+  'rcs_javascript': 43,
+  'rcs_parse': 518,
+  'rcs_gc': 17,
+  'rcs_ic': 3.8
 }, {
   'name': 'iPhone 7 - Safari',
   'parse': 76.78,
@@ -77,12 +96,24 @@ export default [{
   'name': 'Moto E - Chrome 55',
   'parse': 2806.21,
   'eval': 141.089,
-  'image': './static/moto-e.jpg'
+  'image': './static/moto-e.jpg',
+  'rcs_compile': 2142,
+  'rcs_runtime': 150,
+  'rcs_javascript': 70,
+  'rcs_parse': 758,
+  'rcs_gc': 32,
+  'rcs_ic': 5.5
 }, {
   'name': 'Galaxy S7 Edge - Chrome 55',
   'parse': 1220,
   'eval': 41,
-  'image': './static/galaxy-s7.jpg'
+  'image': './static/galaxy-s7.jpg',
+  'rcs_compile': 780,
+  'rcs_runtime': 58,
+  'rcs_javascript': 34,
+  'rcs_parse': 194,
+  'rcs_gc': 9.8,
+  'rcs_ic': 2.1
 }, {
   'name': 'Galaxy S6 Edge - Chrome 55',
   'parse': 1141.63,
@@ -92,12 +123,24 @@ export default [{
   'name': 'Galaxy S5 - Chrome 55',
   'parse': 2224.495,
   'eval': 75.909,
-  'image': './static/galaxy-s5.jpg'
+  'image': './static/galaxy-s5.jpg',
+  'rcs_compile': 1885,
+  'rcs_runtime': 138,
+  'rcs_javascript': 75,
+  'rcs_parse': 496,
+  'rcs_gc': 24,
+  'rcs_ic': 3.4
 }, {
   'name': 'Moto G1 - Chrome 55',
   'parse': 2936.944,
   'eval': 169.385,
-  'image': './static/motog-gen1.jpg'
+  'image': './static/motog-gen1.jpg',
+  'rcs_compile': 2048,
+  'rcs_runtime': 148,
+  'rcs_javascript': 71,
+  'rcs_parse': 712,
+  'rcs_gc': 29,
+  'rcs_ic': 5.3
 }, {
   'name': 'Nexus 7 - Chrome 55',
   'parse': 3005.095,

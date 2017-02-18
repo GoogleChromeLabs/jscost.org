@@ -478,13 +478,15 @@ export default {
 
 .device-entry {
   height: 260px;
-  padding: 10px;
+  /*padding: 10px;*/
+  padding: 10px 10px 10px 0px;
   text-align: center;
   display: block;
 }
 
 .hasCustomTrace .device-entry {
   height: 360px;
+  /*width: 270px;*/
 }
 
 .hasCustomTrace .js-bundle-size, .hasCustomTrace .gzip-preview {
@@ -510,6 +512,10 @@ label {
 
 .estimated-js-message {
   font-size: 2em;
+}
+
+.hasCustomTrace .device-manager {
+  max-width: 96%;
 }
 
 /* Mobile styles */
