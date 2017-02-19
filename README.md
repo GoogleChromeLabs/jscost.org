@@ -10,6 +10,26 @@ Timeline to estimate the performance of JavaScript on different mobile devices.
 
 * See [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## Build Setup
+
+**Requires Node.js 6+**
+
+``` bash
+cd app
+
+# install dependencies
+npm install # or yarn
+
+# serve in dev mode, with hot reload at localhost:8080
+npm run dev
+
+# build for production (including Service Worker generation)
+npm run build
+
+# lint sources
+npm run lint
+```
+
 ## Licensing
 
 * See [LICENSE](LICENSE)
