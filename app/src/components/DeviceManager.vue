@@ -81,7 +81,7 @@
       <p class='estimated-js-message'><strong>{{this.computeGZippedSize(this.bundleSizeBudget)}}KB</strong> (gzipped) of average JavaScript is estimated to load as follows:</p>
     </template>
 
-    <div class='device-manager horizontal layout wrap'>
+    <div class='device-manager horizontal layout wrap center'>
       <div v-for='item in devices' class='device-entry-container'>
         <div class='device-entry'>
           <div><strong><span>{{item.name}}</span></strong></div>
@@ -127,7 +127,7 @@
               <timeline-legend
                 :value="formatOutput(getCustomTraceDeviceTotalScriptingTime(item))"
                 color="rgb(243, 210, 124)"
-                title="Time in JavaScript"></timeline-legend>
+                title="JavaScript Start-up"></timeline-legend>
 
               <timeline-legend
                 :value="formatOutput(getCustomTraceEstimateForDeviceProp(item, 'JS Frame'))"
@@ -472,13 +472,13 @@ export default {
 .device-manager {
   padding: 10px;
   display: flex;
-  max-width: 96%;
+  max-width: 1350px;
+  /*max-width: 1100px;*/
   margin: 0 auto;
 }
 
 .device-entry {
   height: 260px;
-  /*padding: 10px;*/
   padding: 10px 10px 10px 0px;
   text-align: center;
   display: block;
@@ -515,7 +515,7 @@ label {
 }
 
 .hasCustomTrace .device-manager {
-  max-width: 96%;
+  max-width: 1200px;
 }
 
 /* Mobile styles */
@@ -524,6 +524,9 @@ label {
 }
 
 @media (max-width: 450px) {
+  .device-manager {
+    max-width: 96%;
+  }
   .device-entry-container {
     margin: 0 auto;
   }
