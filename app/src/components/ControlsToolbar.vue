@@ -33,7 +33,7 @@
 
     <!-- Network emulation -->
     <div class='controls-entry change-network-speed'>
-      <label for='input_downloadspeed'>Network</label>
+      <label for='input_downloadspeed'>Network speed</label>
       <select v-model='networkSelected' @change='changeNetworkSpeed'>
         <option v-for='option in network' v-bind:value='option.download'>
           {{ option.title }}
@@ -59,6 +59,7 @@
       <!--<label for='selectFile'>Select Timeline Trace</label>-->
       <input  id='selectFile' type='file' v-on:change='customTraceSelected'/>
       <input class='mdl-button mdl-button--colored mdl-button--raised' type='submit' id='uploadTimelineBtn' value='Select DevTools Trace' @click='uploadTimelineTrace'/>
+      <button class='mdl-button mdl-button--colored mdl-button--raised' @click='demoTimelineTrace'>Demo</button>
     </div>
 
     <!-- Reset the state of the world -->
@@ -103,6 +104,17 @@ export default {
     },
     changeCustomNetworkSpeed () {
       this.$emit('networkChanged', this.downloadSpeed)
+    },
+    demoTimelineTrace () {
+      this.$emit('beforeTraceRead')
+      this.reset()
+      window.fetch('/static/theverge.json')
+      .then(data => {
+        return data.text()
+      }).then(result => {
+        this.$emit('traceSelected', result)
+        this.customTraceLoaded = true
+      })
     },
     // Handle trace selection
     customTraceSelected (e) {
@@ -226,6 +238,9 @@ label {
     color: rgb(66,66,66);
 }
 
+.change-network-speed select {
+  margin-top: 3px;
+}
 
 /* Mobile styles */
 @media (max-width: 800px) {
