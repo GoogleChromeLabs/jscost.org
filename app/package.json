@@ -8,7 +8,7 @@
     "dev": "node build/dev-server.js",
     "build": "node build/build.js && npm run offline",
     "lint": "eslint --ext .js,.vue src",
-    "offline": "sw-precache --root=dist"
+    "offline": "sw-precache --root=dist --config=sw-precache-config.js"
   },
   "dependencies": {
     "devtools-timeline-model-browser": "^1.0.2",
