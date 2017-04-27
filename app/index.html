@@ -13,6 +13,10 @@
     <link rel="shortcut icon" href="./static/favicon.ico">
     <meta name="msapplication-config" content="./static/browserconfig.xml">
     <meta name="theme-color" content="#3e9f8b">
+    <% for (var chunk of webpack.chunks) {
+        for (var file of chunk.files) {
+          if (file.match(/\.(js|css)$/)) { %>
+    <link rel="<%= chunk.initial?'preload':'prefetch' %>" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>"><% }}} %>
   </head>
   <body>
   <div id="app">
