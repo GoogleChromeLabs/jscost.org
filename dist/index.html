@@ -1,0 +1,97 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><title>JSCost.org</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=apple-touch-icon sizes=180x180 href=./static/apple-touch-icon.png><link rel=icon type=image/png href=./static/favicon-32x32.png sizes=32x32><link rel=icon type=image/png href=./static/favicon-16x16.png sizes=16x16><link rel=manifest href=./static/manifest.json><link rel=mask-icon href=./static/safari-pinned-tab.svg color=#5bbad5><link rel="shortcut icon" href=./static/favicon.ico><meta name=msapplication-config content=./static/browserconfig.xml><meta name=theme-color content=#3e9f8b><link rel=prefetch href=/static/js/0.07ebb6e357f7a7a86720.js as=script><link rel=preload href=/static/js/manifest.db6004391d67981f094e.js as=script><link rel=preload href=/static/js/vendor.b0c7830bdd984dff4310.js as=script><link rel=preload href=/static/js/app.7ca921d23feeafa3980f.js as=script><link rel=preload href=/static/css/app.2b9ae4e66a66fd5151a047eef1298d3d.css as=style><link href=/static/css/app.2b9ae4e66a66fd5151a047eef1298d3d.css rel=stylesheet></head><body><div id=app><div class=header-cont><div class=header><img id=logo src=/static/logo.svg> <span>A JavaScript cost visualization tool</span></div></div><footer>Built with 💜 by <a href=https://twitter.com/addyosmani>Addy Osmani</a></footer></div><style>/* App Shell inline styles */
+      #app {
+        font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 50px;
+      }
+      body {
+        margin: 0;
+      }
+      .header-cont {
+        width:100%;
+        position:fixed;
+        top:0px;
+        right: 0;
+        left: 0; 
+        z-index: 999;
+      }
+      .header {
+        background:#333333;
+        width:100%;
+        margin:0px auto;
+        color: white;
+      }
+      .header span {
+        display: block;
+        height: 23px;
+      }
+      #manager .dark {
+        margin-top: 10px;
+      }
+      #logo {
+        font-weight: bold;
+        font-size: 18px;
+        padding-top: 10px;
+        width: 90px;
+      }
+      footer {
+        padding: 50px;
+        font-size: 1.1em;
+      }
+
+      footer a {
+        text-decoration: none;
+        font-weight: 700;
+        color: #666;
+      }</style><script>if ('serviceWorker' in navigator) {
+        // Delay registration until after the page has loaded, to ensure that our
+        // precaching requests don't degrade the first visit experience.
+        // See https://developers.google.com/web/fundamentals/instant-and-offline/service-worker/registration
+        window.addEventListener('load', function() {
+          // Your service-worker.js *must* be located at the top-level directory relative to your site.
+          // It won't be able to control pages unless it's located at the same level or higher than them.
+          // *Don't* register service worker file in, e.g., a scripts/ sub-directory!
+          // See https://github.com/slightlyoff/ServiceWorker/issues/468
+          navigator.serviceWorker.register('service-worker.js').then(function(reg) {
+            // updatefound is fired if service-worker.js changes.
+            reg.onupdatefound = function() {
+              // The updatefound event implies that reg.installing is set; see
+              // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
+              var installingWorker = reg.installing;
+
+              installingWorker.onstatechange = function() {
+                switch (installingWorker.state) {
+                  case 'installed':
+                    if (navigator.serviceWorker.controller) {
+                      // At this point, the old content will have been purged and the fresh content will
+                      // have been added to the cache.
+                      // It's the perfect time to display a "New content is available; please refresh."
+                      // message in the page's interface.
+                      console.log('New or updated content is available.');
+                    } else {
+                      // At this point, everything has been precached.
+                      // It's the perfect time to display a "Content is cached for offline use." message.
+                      console.log('Content is now available offline!');
+                    }
+                    break;
+
+                  case 'redundant':
+                    console.error('The installing service worker became redundant.');
+                    break;
+                }
+              };
+            };
+          }).catch(function(e) {
+            console.error('Error during service worker registration:', e);
+          });
+        });
+      }</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-89278700-1', 'auto');
+      ga('send', 'pageview');</script><script type=text/javascript src=/static/js/manifest.db6004391d67981f094e.js></script><script type=text/javascript src=/static/js/vendor.b0c7830bdd984dff4310.js></script><script type=text/javascript src=/static/js/app.7ca921d23feeafa3980f.js></script></body></html>
