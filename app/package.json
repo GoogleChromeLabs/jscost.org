@@ -8,7 +8,8 @@
     "dev": "node build/dev-server.js",
     "build": "node build/build.js && npm run offline",
     "lint": "eslint --ext .js,.vue src",
-    "offline": "sw-precache --root=dist --config=sw-precache-config.js"
+    "offline": "sw-precache --root=dist --config=sw-precache-config.js",
+    "test": "bundlesize"
   },
   "dependencies": {
     "devtools-timeline-model-browser": "^1.0.2",
@@ -24,6 +25,7 @@
     "babel-preset-es2015": "^6.0.0",
     "babel-preset-stage-2": "^6.0.0",
     "babel-register": "^6.0.0",
+    "bundlesize": "^0.13.2",
     "chalk": "^1.1.3",
     "connect-history-api-fallback": "^1.1.0",
     "css-loader": "^0.25.0",
@@ -58,5 +60,11 @@
   "engines": {
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
-  }
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/static/js/vendor.*.js",
+      "maxSize": "30 Kb"
+    }
+  ]
 }
