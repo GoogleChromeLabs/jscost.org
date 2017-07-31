@@ -1,3 +1,4 @@
 bower_components/
 node_modules/
 app/node_modules
+dist
