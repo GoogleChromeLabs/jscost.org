@@ -242,6 +242,7 @@ export default {
 
     bundleSizeChanged (bundleSize) {
       this.bundleSizeBudget = bundleSize
+      this._.partition([1, 2, 3, 4], n => n % 2)
     },
     // </toolbar-controls>
 

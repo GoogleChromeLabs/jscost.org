@@ -19,6 +19,10 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import lodash from 'lodash'
+import VueLodash from 'vue-lodash/dist/vue-lodash.min'
+
+Vue.use(VueLodash, lodash)
 
 /* eslint-disable no-new */
 new Vue({
