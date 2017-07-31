@@ -65,6 +65,10 @@
     {
       "path": "./dist/static/js/vendor.*.js",
       "maxSize": "35 Kb"
+    },
+    {
+      "path": "./dist/static/js/app.*.js",
+      "maxSize": "25 Kb"
     }
   ]
 }
