@@ -51,5 +51,5 @@ export function _filterEventsForDomInteractive (e) {
 }
 
 export function _filterEventsForFirstTextPaint (e) {
-  return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint' && e.args.frame === ourframe
+  return e.categoriesString.includes('devtools.timeline') && e.name === 'firstTextPaint' && e.args.frame === ourframe
 }
